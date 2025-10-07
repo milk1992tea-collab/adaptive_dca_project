@@ -1,0 +1,68 @@
+{
+  "strategy_name": "MultiAsset_MultiTimeframe_Fusion",
+  "assets": ["BTCUSDT", "ETHUSDT", "SOLUSDT", "BNBUSDT", "XRPUSDT"],
+  "fusion_logic": {
+    "daily": {
+      "role": "trend_filter",
+      "best_strategy": "RSI+TD9",
+      "parameters": {
+        "rsi_period": 21,
+        "rsi_buy": 25,
+        "rsi_sell": 75,
+        "dca_interval": 12
+      },
+      "rule": "RSI > 50 → 多頭，只允許做多；RSI < 50 → 空頭，只允許做空"
+    },
+    "4h": {
+      "role": "trend_confirmation",
+      "best_strategy": "MACD+RSI",
+      "parameters": {
+        "rsi_period": 18,
+        "rsi_buy": 28,
+        "rsi_sell": 72,
+        "dca_interval": 20
+      },
+      "rule": "確認日線方向是否一致，若背離則 HOLD"
+    },
+    "1h": {
+      "role": "entry_exit",
+      "best_strategy": "RSI+MACD",
+      "parameters": {
+        "rsi_period": 15,
+        "rsi_buy": 26,
+        "rsi_sell": 73,
+        "dca_interval": 30
+      },
+      "rule": "依照訊號進出場，若與日線方向一致則執行"
+    },
+    "15m": {
+      "role": "scaling",
+      "best_strategy": "MACD+SKDJ",
+      "parameters": {
+        "rsi_period": 9,
+        "rsi_buy": 30,
+        "rsi_sell": 70,
+        "dca_interval": 8
+      },
+      "rule": "用於加倉/減倉，僅在 1h 已有倉位時啟用"
+    }
+  },
+  "risk_management": {
+    "initial_capital": 1000,
+    "max_leverage": 2,
+    "position_sizing": "dynamic",
+    "stop_loss": 0.05,
+    "take_profit": 0.15
+  },
+  "execution": {
+    "exchange": "binance",
+    "quote_asset": "USDT",
+    "mode": "live",
+    "timeframes": ["15m", "1h", "4h", "1d"]
+  },
+  "logging": {
+    "save_trades": true,
+    "save_signals": true,
+    "log_level": "INFO"
+  }
+}

@@ -1,0 +1,28 @@
+# === 策略函數集合 ===
+def rsi_macd_signal(series):
+    rsi = ta.rsi(series, length=14)
+    macd = ta.macd(series, fast=12, slow=26, signal=9)
+    macd_line = macd["MACD_12_26_9"]
+    macd_signal = macd["MACDs_12_26_9"]
+    if rsi.iloc[-1] < 30 and macd_line.iloc[-1] > macd_signal.iloc[-1]:
+        return "buy"
+    elif rsi.iloc[-1] > 70 and macd_line.iloc[-1] < macd_signal.iloc[-1]:
+        return "sell"
+    return None
+
+def bollinger_signal(series):
+    bb = ta.bbands(series, length=20, std=2)
+    bb_low = bb["BBL_20_2.0"].iloc[-1]
+    bb_high = bb["BBU_20_2.0"].iloc[-1]
+    last_price = series.iloc[-1]
+    if last_price < bb_low:
+        return "buy"
+    elif last_price > bb_high:
+        return "sell"
+    return None
+
+# 策略字典
+STRATEGIES = {
+    "RSI_MACD": rsi_macd_signal,
+    "BOLLINGER": bollinger_signal
+}

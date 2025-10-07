@@ -1,0 +1,2 @@
+symbol,strategy,timeframe,total_pnl,max_drawdown,sharpe_ratio,trades
+BTC/USDT:USDT,trend_mix,5m,0.0,0.0,0.0,0

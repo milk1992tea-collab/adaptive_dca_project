@@ -1,0 +1,6 @@
+id,params,mode,recommended_amount,pnl,maxdd,sharpe,win_rate,strategy_name,ltf_interval,created_at,raw_row,score
+1,{},spot,50,0.0,0.0,0.0,0.0,TD13+RSI,5m,2025-09-28 04:09:51.809068,"{'trial_id': 1, 'number': 0, 'study_id': 1, 'state': 'COMPLETE', 'datetime_start': '2025-09-28 04:09:51.809068', 'datetime_complete': '2025-09-28 04:09:54.585703'}",0.0
+2,{},spot,50,0.0,0.0,0.0,0.0,TD13+RSI,5m,2025-09-28 04:09:54.597493,"{'trial_id': 2, 'number': 1, 'study_id': 1, 'state': 'COMPLETE', 'datetime_start': '2025-09-28 04:09:54.597493', 'datetime_complete': '2025-09-28 04:09:57.227250'}",0.0
+3,{},spot,50,0.0,0.0,0.0,0.0,TD13+RSI,5m,2025-09-28 04:09:57.237798,"{'trial_id': 3, 'number': 2, 'study_id': 1, 'state': 'COMPLETE', 'datetime_start': '2025-09-28 04:09:57.237798', 'datetime_complete': '2025-09-28 04:09:59.991819'}",0.0
+4,{},spot,50,0.0,0.0,0.0,0.0,TD13+RSI,5m,2025-09-28 04:10:00.003049,"{'trial_id': 4, 'number': 3, 'study_id': 1, 'state': 'COMPLETE', 'datetime_start': '2025-09-28 04:10:00.003049', 'datetime_complete': '2025-09-28 04:10:02.732607'}",0.0
+5,{},spot,50,0.0,0.0,0.0,0.0,TD13+RSI,5m,2025-09-28 04:10:02.744657,"{'trial_id': 5, 'number': 4, 'study_id': 1, 'state': 'COMPLETE', 'datetime_start': '2025-09-28 04:10:02.744657', 'datetime_complete': '2025-09-28 04:10:05.393422'}",0.0

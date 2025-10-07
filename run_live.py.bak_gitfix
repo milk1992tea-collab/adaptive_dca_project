@@ -1,0 +1,289 @@
+﻿
+# AUTOPATCH SAFE DEFS
+def sanitize_for_log(s):
+    try:
+        if s is None:
+            return ''
+        # remove literal escape sequences coming from serialized JSON/logs
+        return str(s).replace('\\r','').replace('\\n','').replace('`n','').replace('\\\\`n','')
+    except Exception:
+        return str(s)
+from datetime import datetime
+import td_test_manager
+
+try:
+    ts_local = datetime.now().isoformat()
+except Exception:
+    ts_local = ''
+try:
+    mode_local = getattr(globals().get('args'), 'mode', '') if 'args' in globals() else ''
+except Exception:
+    mode_local = ''
+
+# safe JSON loader
+def load_signals_safe(path='signals_tmp.json'):
+    try:
+        p = Path(path)
+        if not p.exists(): return []
+        txt = p.read_text(encoding='utf-8-sig')
+        return json.loads(txt) if txt and txt.strip() else []
+    except Exception:
+        return []
+
+import csv, time, sys, argparse, subprocess, shlex, os, tempfile, random, string
+import os
+from datetime import datetime
+import td_test_manager
+
+
+def load_config(path):
+    rows=[]
+    with open(path, newline='', encoding='utf8') as f:
+        first = f.readline()
+        if not first:
+            return rows
+        headers = [h.strip() for h in first.strip().split(',')]
+        for raw in csv.reader(f):
+            if not raw:
+                continue
+            data = {}
+            for i, h in enumerate(headers):
+                val = raw[i].strip() if i < len(raw) else ''
+                data[h] = val
+                data[h.lower()] = val
+            rows.append(data)
+    return rows
+
+def safe_log_open(path):
+    try:
+        return open(path, "a", encoding="utf8")
+    except Exception:
+        fallback = os.path.join(os.path.expanduser("~"), "AppData", "Local", "Temp", "live_eth_fallback_" + "".join(random.choices(string.ascii_lowercase+string.digits, k=6)) + ".log")
+        try:
+            return open(fallback, "a", encoding="utf8")
+        except Exception:
+            return None
+
+def call_backtester(symbol, strategy, tf, params_str, export_csv):
+    # ensure we pass string literals (not None)
+    sym = symbol or ""
+    strat = strategy or ""
+    tfv = tf or ""
+    cmd = f'python -u backtester.py --symbol "{sym}" --strategy "{strat}" --tf {tfv} --export_csv "{export_csv}" --params "{params_str}"'
+    proc = subprocess.run(cmd, shell=True, capture_output=True, text=True)
+    out = proc.stdout.strip()
+    err = proc.stderr.strip()
+    return proc.returncode, out, err
+
+def append_log_handle(handle, text):
+    if handle:
+        try:
+            handle.write(text + "`n")
+            handle.flush()
+            return True
+        except Exception:
+            return False
+    else:
+        try:
+            print(text)
+            return True
+        except Exception:
+            return False
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--config', required=True)
+    parser.add_argument('--mode', choices=['paper','live'], default='paper')
+    parser.add_argument('--interval', type=int, default=60, help='seconds between iterations')
+    parser.add_argument('--log-file', default='live_eth_paper.log')
+    args = parser.parse_args()
+
+    cfg = load_config(args.config)
+    if not cfg:
+        print("no config rows found", file=sys.stderr); sys.exit(2)
+
+    log_handle = safe_log_open(args.log_file)
+    ts0 = datetime.now().isoformat()
+    append_log_handle(log_handle, f"{ts0} runner started mode={args.mode} interval={args.interval}s config_rows={len(cfg)}")
+
+    try:
+        for r in cfg:
+            ts = datetime.now().isoformat()
+            # support both normalized and lowercase keys
+            strategy = r.get('strategy') or r.get('strategy'.lower()) or r.get('strategy'.upper()) or ''
+            symbol = r.get('symbol') or r.get('symbol'.lower()) or ''
+            tf = r.get('tf') or r.get('tf'.lower()) or r.get('timeframe') or ''
+            params_str = "initial_capital=1000"
+            export_csv = "runner_tmp_result.csv"
+
+            strategy_to_use = (strategy or '').replace('_eth_test','').replace('_test','').replace('_trial','');
+            rc, out, err = call_backtester(symbol, strategy_to_use, tf, params_str, export_csv)
+            # log what we actually called
+            line = f"{ts},{symbol},{strategy},{tf},{rc},{out.replace(chr(10),' ')}"
+            append_log_handle(log_handle, line)
+
+            try:
+                if os.path.exists(export_csv):
+                    with open(export_csv, newline='', encoding='utf8') as f:
+                        reader = csv.DictReader(f)
+                        first = next(reader, None)
+                    if first:
+                        monitor_line = {
+                            'timestamp': ts,
+                            'symbol': symbol,
+                            'strategy': strategy,
+                            'mode': args.mode,
+                            'open_positions': 0,
+                            'unrealized_pnl': first.get('total_pnl','0'),
+                            'realized_pnl': first.get('total_pnl','0'),
+                            'account_balance': 1000,
+                            'equity': 1000 + float(first.get('total_pnl','0')),
+                            'max_drawdown': first.get('max_drawdown','0'),
+                            'trades_today': first.get('trades','0'),
+                            'avg_slippage': 0.0,
+                            'last_error': ''
+                        }
+                        header = not os.path.exists('daily_monitor.csv')
+                        with open('daily_monitor.csv','a',newline='',encoding='utf8') as mf:
+                            w=csv.DictWriter(mf, fieldnames=list(monitor_line.keys()))
+                            if header: w.writeheader()
+                            w.writerow(monitor_line)
+            except Exception as e:
+                append_log_handle(log_handle, f"{ts},ERROR,monitor_fail,{e}")
+
+    finally:
+        if log_handle:
+            try:
+                log_handle.close()
+            except:
+                pass
+
+if __name__ == '__main__':
+    main()
+
+
+
+
+# BEGIN AUTOPATCH: integrate signals_tmp + enforce + exec simulate
+import json
+from pathlib import Path
+try:
+    sig_path = Path("signals_tmp.json")
+    if sig_path.exists():
+        signals = json.loads(sig_path.read_text(encoding="utf8"))
+    else:
+        signals = []
+except Exception:
+    signals = []
+
+# group signals by symbol and pick highest-score per symbol (minimal priority)
+signals_by_symbol = {}
+for s in signals:
+    sym = s.get("symbol")
+    if not sym: 
+        continue
+    prev = signals_by_symbol.get(sym)
+    if not prev or (s.get("score",0) > prev.get("score",0)):
+        signals_by_symbol[sym] = s
+
+# ordered candidates
+candidates = [signals_by_symbol[k] for k in sorted(signals_by_symbol.keys())]
+
+# convert to symbol list for portfolio check
+candidate_symbols = [c.get("symbol") for c in candidates]
+
+# try to import portfolio_manager and execution_engine and run minimal simulate flow
+try:
+    from portfolio_manager import enforce_max_positions, PortfolioManager
+except Exception:
+    enforce_max_positions = None
+    PortfolioManager = None
+
+try:
+    from execution_engine import ExecutionEngine
+except Exception:
+    ExecutionEngine = None
+
+# get current positions if available
+current_positions = []
+try:
+    if PortfolioManager:
+        pm = PortfolioManager()
+        current_positions = pm.get_current_positions()
+except Exception:
+    current_positions = []
+
+# enforce max positions
+if enforce_max_positions:
+    allowed = enforce_max_positions(current_positions, candidate_symbols)
+else:
+    allowed = candidate_symbols
+
+# simulate execute for allowed candidates (paper)
+try:
+    exec_engine = ExecutionEngine(mode="simulate")
+    for sym in allowed:
+        # find representative signal
+        s = signals_by_symbol.get(sym, {"signal":"hold"})
+        if s.get("signal") == "buy":
+            exec_engine.execute_signal(sym, "buy", price=1.0, capital_fraction=0.01)
+        elif s.get("signal") == "sell":
+            exec_engine.execute_signal(sym, "sell", price=1.0)
+except Exception:
+    pass
+# END AUTOPATCH
+
+
+# BEGIN AUTOPATCH: prefer signals_tmp over backtester
+try:
+    ts_local = datetime.now().isoformat()
+except Exception:
+    ts_local = ''
+try:
+    mode_local = getattr(globals().get('args'), 'mode', '') if 'args' in globals() else ''
+except Exception:
+    mode_local = ''
+
+try:
+    sig_path = Path("signals_tmp.json")
+    if sig_path.exists():
+        s_txt = sig_path.read_text(encoding="utf-8-sig")
+        signals = json.loads(s_txt) if s_txt.strip() else []
+    else:
+        signals = []
+except Exception:
+    signals = []
+
+skip_backtester = False
+if signals:
+    first = signals[0] if isinstance(signals, list) and signals else None
+    if first:
+        monitor_line = {
+            "timestamp": ts_local,
+            "symbol": first.get("symbol","" ),
+            "strategy": first.get("strategy","" ),
+            "mode": mode_local,
+            "open_positions": 0,
+            "unrealized_pnl": first.get("total_pnl","0"),
+            "realized_pnl": first.get("total_pnl","0"),
+            "account_balance": 1000,
+            "equity": 1000 + float(first.get("total_pnl","0") or 0),
+            "max_drawdown": first.get("max_drawdown","0"),
+            "trades_today": first.get("trades","0"),
+            "avg_slippage": 0.0,
+            "last_error": ""
+        }
+        header = not os.path.exists("daily_monitor.csv")
+        with open("daily_monitor.csv","a",newline="",encoding="utf8") as mf:
+            w=csv.DictWriter(mf, fieldnames=list(monitor_line.keys()))
+            if header: w.writeheader()
+            w.writerow(monitor_line)
+    skip_backtester = True
+# END AUTOPATCH
+
+
+
+
+
+
+

@@ -1,0 +1,12 @@
+source_file,metric,value
+td_test_summary_20251003.csv,metric,value
+td_test_summary_20251003.csv,total_signals,2
+td_test_summary_20251003.csv
+td_test_summary_20251003.csv,top_symbols,count,avg_strength
+td_test_summary_20251003.csv,ETH/USDT:USDT,2,0.8
+td_test_summary_20251003.csv
+td_test_summary_20251003.csv,day,count
+td_test_summary_20251003.csv,2025-10-03,2
+td_test_summary_20251003.csv
+td_test_summary_20251003.csv,td_count,count
+td_test_summary_20251003.csv,9,2

@@ -1,0 +1,332 @@
+﻿[
+    {
+        "symbol":  "BTC/USDT:USDT",
+        "tf":  "1h",
+        "strategy":  "hybrid_mix",
+        "params":  "param_2",
+        "metrics":  {
+                        "total_pnl":  26.979436399637279,
+                        "drawdown":  0.029795597484276851,
+                        "sharpe":  0.27691054757082512
+                    }
+    },
+    {
+        "symbol":  "BTC/USDT:USDT",
+        "tf":  "1h",
+        "strategy":  "hybrid_mix",
+        "params":  "param_0",
+        "metrics":  {
+                        "total_pnl":  26.979436399637279,
+                        "drawdown":  0.029795597484276851,
+                        "sharpe":  0.27691054757082512
+                    }
+    },
+    {
+        "symbol":  "BTC/USDT:USDT",
+        "tf":  "1h",
+        "strategy":  "hybrid_mix",
+        "params":  "param_1",
+        "metrics":  {
+                        "total_pnl":  26.979436399637279,
+                        "drawdown":  0.029795597484276851,
+                        "sharpe":  0.27691054757082512
+                    }
+    },
+    {
+        "symbol":  "ETH/USDT:USDT",
+        "tf":  "1h",
+        "strategy":  "hybrid_mix",
+        "params":  "param_3",
+        "metrics":  {
+                        "total_pnl":  33.843387709999433,
+                        "drawdown":  0.048309081471935952,
+                        "sharpe":  0.28856185661204964
+                    }
+    },
+    {
+        "symbol":  "ETH/USDT:USDT",
+        "tf":  "1h",
+        "strategy":  "hybrid_mix",
+        "params":  "param_0",
+        "metrics":  {
+                        "total_pnl":  33.843387709999433,
+                        "drawdown":  0.048309081471935952,
+                        "sharpe":  0.28856185661204964
+                    }
+    },
+    {
+        "symbol":  "ETH/USDT:USDT",
+        "tf":  "1h",
+        "strategy":  "hybrid_mix",
+        "params":  "param_2",
+        "metrics":  {
+                        "total_pnl":  33.843387709999433,
+                        "drawdown":  0.048309081471935952,
+                        "sharpe":  0.28856185661204964
+                    }
+    },
+    {
+        "symbol":  "SOL/USDT:USDT",
+        "tf":  "1h",
+        "strategy":  "multi_tf_hybrid",
+        "params":  "param_0",
+        "metrics":  {
+                        "total_pnl":  0,
+                        "drawdown":  0,
+                        "sharpe":  0
+                    }
+    },
+    {
+        "symbol":  "SOL/USDT:USDT",
+        "tf":  "1h",
+        "strategy":  "multi_tf_hybrid",
+        "params":  "param_3",
+        "metrics":  {
+                        "total_pnl":  0,
+                        "drawdown":  0,
+                        "sharpe":  0
+                    }
+    },
+    {
+        "symbol":  "SOL/USDT:USDT",
+        "tf":  "1h",
+        "strategy":  "multi_tf_hybrid",
+        "params":  "param_2",
+        "metrics":  {
+                        "total_pnl":  0,
+                        "drawdown":  0,
+                        "sharpe":  0
+                    }
+    },
+    {
+        "symbol":  "XPL/USDT:USDT",
+        "tf":  "1h",
+        "strategy":  "multi_tf_hybrid",
+        "params":  "param_3",
+        "metrics":  {
+                        "total_pnl":  306.29091944207221,
+                        "drawdown":  0.46482725813165254,
+                        "sharpe":  0.37621885839494973
+                    }
+    },
+    {
+        "symbol":  "XPL/USDT:USDT",
+        "tf":  "1h",
+        "strategy":  "multi_tf_hybrid",
+        "params":  "param_2",
+        "metrics":  {
+                        "total_pnl":  303.87133504127519,
+                        "drawdown":  0.46482725813165254,
+                        "sharpe":  0.37458903121049164
+                    }
+    },
+    {
+        "symbol":  "XPL/USDT:USDT",
+        "tf":  "1h",
+        "strategy":  "multi_tf_hybrid",
+        "params":  "param_1",
+        "metrics":  {
+                        "total_pnl":  300.597779675491,
+                        "drawdown":  0.46482725813165254,
+                        "sharpe":  0.37237982480713894
+                    }
+    },
+    {
+        "symbol":  "XRP/USDT:USDT",
+        "tf":  "1h",
+        "strategy":  "multi_tf_hybrid",
+        "params":  "param_3",
+        "metrics":  {
+                        "total_pnl":  29.086066722736177,
+                        "drawdown":  0.01853012887495643,
+                        "sharpe":  0.50295030939486784
+                    }
+    },
+    {
+        "symbol":  "XRP/USDT:USDT",
+        "tf":  "1h",
+        "strategy":  "multi_tf_hybrid",
+        "params":  "param_1",
+        "metrics":  {
+                        "total_pnl":  29.051023268853442,
+                        "drawdown":  0.01853012887495643,
+                        "sharpe":  0.50236134911329122
+                    }
+    },
+    {
+        "symbol":  "XRP/USDT:USDT",
+        "tf":  "1h",
+        "strategy":  "multi_tf_hybrid",
+        "params":  "param_0",
+        "metrics":  {
+                        "total_pnl":  29.051023268853442,
+                        "drawdown":  0.01853012887495643,
+                        "sharpe":  0.50236134911329122
+                    }
+    },
+    {
+        "symbol":  "DOGE/USDT:USDT",
+        "tf":  "1h",
+        "strategy":  "hybrid_mix",
+        "params":  "param_3",
+        "metrics":  {
+                        "total_pnl":  124.75577793662114,
+                        "drawdown":  0.25875180060969477,
+                        "sharpe":  0.33475650396147855
+                    }
+    },
+    {
+        "symbol":  "DOGE/USDT:USDT",
+        "tf":  "1h",
+        "strategy":  "hybrid_mix",
+        "params":  "param_0",
+        "metrics":  {
+                        "total_pnl":  124.75577793662114,
+                        "drawdown":  0.25875180060969477,
+                        "sharpe":  0.33475650396147855
+                    }
+    },
+    {
+        "symbol":  "DOGE/USDT:USDT",
+        "tf":  "1h",
+        "strategy":  "hybrid_mix",
+        "params":  "param_2",
+        "metrics":  {
+                        "total_pnl":  124.75577793662114,
+                        "drawdown":  0.25875180060969477,
+                        "sharpe":  0.33475650396147855
+                    }
+    },
+    {
+        "symbol":  "ASTER/USDT:USDT",
+        "tf":  "1h",
+        "strategy":  "osc_mix",
+        "params":  "param_0",
+        "metrics":  {
+                        "total_pnl":  1253.0094420511382,
+                        "drawdown":  0.09516968935176881,
+                        "sharpe":  2.2008044473953894
+                    }
+    },
+    {
+        "symbol":  "ASTER/USDT:USDT",
+        "tf":  "1h",
+        "strategy":  "osc_mix",
+        "params":  "param_3",
+        "metrics":  {
+                        "total_pnl":  1252.4673645913963,
+                        "drawdown":  0.09516968935176881,
+                        "sharpe":  2.2002077634363797
+                    }
+    },
+    {
+        "symbol":  "ASTER/USDT:USDT",
+        "tf":  "1h",
+        "strategy":  "osc_mix",
+        "params":  "param_2",
+        "metrics":  {
+                        "total_pnl":  1251.7897677667193,
+                        "drawdown":  0.09516968935176881,
+                        "sharpe":  2.1994605695942981
+                    }
+    },
+    {
+        "symbol":  "ALPINE/USDT:USDT",
+        "tf":  "1h",
+        "strategy":  "multi_tf_hybrid",
+        "params":  "param_3",
+        "metrics":  {
+                        "total_pnl":  21.417644059153531,
+                        "drawdown":  0.8723007875349309,
+                        "sharpe":  0.43284122821725168
+                    }
+    },
+    {
+        "symbol":  "ALPINE/USDT:USDT",
+        "tf":  "1h",
+        "strategy":  "multi_tf_hybrid",
+        "params":  "param_0",
+        "metrics":  {
+                        "total_pnl":  19.88781234064254,
+                        "drawdown":  0.8723007875349309,
+                        "sharpe":  0.432184345178443
+                    }
+    },
+    {
+        "symbol":  "ALPINE/USDT:USDT",
+        "tf":  "1h",
+        "strategy":  "multi_tf_hybrid",
+        "params":  "param_1",
+        "metrics":  {
+                        "total_pnl":  18.867924528301842,
+                        "drawdown":  0.8723007875349309,
+                        "sharpe":  0.43174601865981321
+                    }
+    },
+    {
+        "symbol":  "PUMPFUN/USDT:USDT",
+        "tf":  "1h",
+        "strategy":  "hybrid_mix",
+        "params":  "param_3",
+        "metrics":  {
+                        "total_pnl":  84.667309546769275,
+                        "drawdown":  0.078996282527881087,
+                        "sharpe":  0.30589603432769713
+                    }
+    },
+    {
+        "symbol":  "PUMPFUN/USDT:USDT",
+        "tf":  "1h",
+        "strategy":  "hybrid_mix",
+        "params":  "param_0",
+        "metrics":  {
+                        "total_pnl":  84.667309546769275,
+                        "drawdown":  0.078996282527881087,
+                        "sharpe":  0.30589603432769713
+                    }
+    },
+    {
+        "symbol":  "PUMPFUN/USDT:USDT",
+        "tf":  "1h",
+        "strategy":  "hybrid_mix",
+        "params":  "param_2",
+        "metrics":  {
+                        "total_pnl":  84.667309546769275,
+                        "drawdown":  0.078996282527881087,
+                        "sharpe":  0.30589603432769713
+                    }
+    },
+    {
+        "symbol":  "FARTCOIN/USDT:USDT",
+        "tf":  "1h",
+        "strategy":  "multi_tf_hybrid",
+        "params":  "param_0",
+        "metrics":  {
+                        "total_pnl":  101.74418604651169,
+                        "drawdown":  0.029346092503987217,
+                        "sharpe":  0.66318193316136009
+                    }
+    },
+    {
+        "symbol":  "FARTCOIN/USDT:USDT",
+        "tf":  "1h",
+        "strategy":  "multi_tf_hybrid",
+        "params":  "param_1",
+        "metrics":  {
+                        "total_pnl":  101.23119015047882,
+                        "drawdown":  0.029346092503987217,
+                        "sharpe":  0.66015502559935357
+                    }
+    },
+    {
+        "symbol":  "FARTCOIN/USDT:USDT",
+        "tf":  "1h",
+        "strategy":  "multi_tf_hybrid",
+        "params":  "param_3",
+        "metrics":  {
+                        "total_pnl":  101.23119015047882,
+                        "drawdown":  0.029346092503987217,
+                        "sharpe":  0.66015502559935357
+                    }
+    }
+]

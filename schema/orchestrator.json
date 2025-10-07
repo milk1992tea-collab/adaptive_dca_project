@@ -1,0 +1,50 @@
+﻿{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Orchestrator API: strategy lifecycle",
+  "type": "object",
+  "definitions": {
+    "strategyParams": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "runSpec": {
+      "type": "object",
+      "properties": {
+        "strategy_id": { "type": "string" },
+        "version": { "type": "string" },
+        "params": { "$ref": "#/definitions/strategyParams" },
+        "dataset_version": { "type": "string" },
+        "dry_run": { "type": "boolean" }
+      },
+      "required": ["strategy_id","version"]
+    }
+  },
+  "properties": {
+    "register": {
+      "type": "object",
+      "properties": {
+        "strategy_id": { "type": "string" },
+        "entrypoint": { "type": "string" },
+        "manifest": { "type": "object" }
+      },
+      "required": ["strategy_id","entrypoint"]
+    },
+    "start": { "$ref": "#/definitions/runSpec" },
+    "stop": {
+      "type": "object",
+      "properties": {
+        "run_id": { "type": "string" },
+        "force": { "type": "boolean" }
+      },
+      "required": ["run_id"]
+    },
+    "status": {
+      "type": "object",
+      "properties": {
+        "run_id": { "type": "string" },
+        "strategy_id": { "type": "string" }
+      }
+    }
+  },
+  "additionalProperties": false
+}

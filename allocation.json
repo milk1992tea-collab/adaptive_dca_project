@@ -1,0 +1,28 @@
+{
+  "modes": {
+    "equal": {
+      "description": "所有幣種平均分配資金",
+      "weights": {}
+    },
+    "weighted": {
+      "description": "依照績效分數加權分配資金（由回測或模擬績效決定）",
+      "weights": {}
+    },
+    "custom": {
+      "description": "手動指定每個幣種的資金比例",
+      "weights": {
+        "BTC/USDT": 0.25,
+        "ETH/USDT": 0.20,
+        "BNB/USDT": 0.15,
+        "SOL/USDT": 0.10,
+        "XRP/USDT": 0.10,
+        "ADA/USDT": 0.05,
+        "DOGE/USDT": 0.05,
+        "AVAX/USDT": 0.05,
+        "TRX/USDT": 0.03,
+        "DOT/USDT": 0.02
+      }
+    }
+  },
+  "active_mode": "equal"
+}

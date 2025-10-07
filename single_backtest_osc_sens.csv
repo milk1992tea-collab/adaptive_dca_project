@@ -1,0 +1,2 @@
+symbol,strategy,timeframe,total_pnl,max_drawdown,sharpe_ratio,trades
+BTC/USDT:USDT,osc_mix,5m,24.18974627157354,0.014616497755751993,4.250694303404196,615

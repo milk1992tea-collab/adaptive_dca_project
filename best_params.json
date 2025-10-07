@@ -1,0 +1,95 @@
+{
+  "strategies": {
+    "trend_mix": {
+      "params": {
+        "step": 8.5,
+        "base_qty": 30.0,
+        "take_profit_pct": 0.05,
+        "stop_loss_pct": -0.02,
+        "strategy": "trend_mix",
+        "weights": {
+          "adx": 0.3,
+          "macd": 0.3,
+          "atr": 0.2,
+          "obv": 0.2
+        },
+        "threshold": 0.25
+      },
+      "score": 92.26,
+      "timestamp": 1759295976,
+      "details": [
+        {
+          "symbol": "BTCUSDT",
+          "metrics": {
+            "pnl": 138.0,
+            "trades": 3,
+            "max_drawdown": 0.049,
+            "sharpe": 0.49,
+            "closed_rounds": 2
+          }
+        }
+      ]
+    },
+    "osc_mix": {
+      "params": {
+        "step": 6.0,
+        "base_qty": 20.0,
+        "take_profit_pct": 0.04,
+        "stop_loss_pct": -0.015,
+        "strategy": "osc_mix",
+        "weights": {
+          "rsi": 0.3,
+          "stoch": 0.3,
+          "boll": 0.2,
+          "roc": 0.2
+        },
+        "threshold": 0.2
+      },
+      "score": 87.15,
+      "timestamp": 1759296000,
+      "details": [
+        {
+          "symbol": "ETHUSDT",
+          "metrics": {
+            "pnl": 55.0,
+            "trades": 5,
+            "max_drawdown": 0.08,
+            "sharpe": 1.38,
+            "closed_rounds": 4
+          }
+        }
+      ]
+    },
+    "hybrid_mix": {
+      "params": {
+        "step": 7.0,
+        "base_qty": 25.0,
+        "take_profit_pct": 0.06,
+        "stop_loss_pct": -0.02,
+        "strategy": "hybrid_mix",
+        "weights": {
+          "adx": 0.2,
+          "rsi": 0.2,
+          "mom": 0.2,
+          "stddev": 0.2,
+          "vwap": 0.2
+        },
+        "threshold": 0.22
+      },
+      "score": 90.05,
+      "timestamp": 1759296050,
+      "details": [
+        {
+          "symbol": "SOLUSDT",
+          "metrics": {
+            "pnl": 33.0,
+            "trades": 2,
+            "max_drawdown": 0.016,
+            "sharpe": 0.01,
+            "closed_rounds": 1
+          }
+        }
+      ]
+    }
+  }
+}

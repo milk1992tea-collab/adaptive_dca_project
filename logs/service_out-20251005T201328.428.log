@@ -1,0 +1,24 @@
+WROTE 40 signals to signals_tmp.json
+WROTE 40 signals to signals_tmp.json
+WROTE 40 signals to signals_tmp.json
+WROTE 40 signals to signals_tmp.json
+WROTE 40 signals to signals_tmp.json
+WROTE 40 signals to signals_tmp.json
+WROTE 40 signals to signals_tmp.json
+WROTE 40 signals to signals_tmp.json
+WROTE 40 signals to signals_tmp.json
+WROTE 40 signals to signals_tmp.json
+WROTE 40 signals to signals_tmp.json
+2025-10-06 04:12:21,420 WARNING replace_signals No signals for 11 cycles; backing off 2 seconds
+WROTE 40 signals to signals_tmp.json
+2025-10-06 04:12:24,422 WARNING replace_signals No signals for 12 cycles; backing off 4 seconds
+WROTE 40 signals to signals_tmp.json
+2025-10-06 04:12:29,424 WARNING replace_signals No signals for 13 cycles; backing off 8 seconds
+WROTE 40 signals to signals_tmp.json
+2025-10-06 04:12:38,425 WARNING replace_signals No signals for 14 cycles; backing off 16 seconds
+WROTE 40 signals to signals_tmp.json
+2025-10-06 04:12:55,428 WARNING replace_signals No signals for 15 cycles; backing off 32 seconds
+WROTE 40 signals to signals_tmp.json
+2025-10-06 04:13:28,429 WARNING replace_signals No signals for 16 cycles; backing off 60 seconds
+WROTE 40 signals to signals_tmp.json
+2025-10-06 04:14:29,431 WARNING replace_signals No signals for 17 cycles; backing off 60 seconds

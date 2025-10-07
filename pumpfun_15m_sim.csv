@@ -1,0 +1,2 @@
+symbol,strategy,timeframe,total_pnl,max_drawdown,sharpe_ratio,trades
+PUMPFUN/USDT:USDT,hybrid_mix,15m,125.69721115537845,0.12916666666666668,2.1967164657884575,2

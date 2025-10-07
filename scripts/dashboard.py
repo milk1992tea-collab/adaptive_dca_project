@@ -1,0 +1,98 @@
+# scripts/dashboard.py
+import os
+import streamlit as st
+import pandas as pd
+from code.simulate_dca_strategy import simulate_dca_strategy
+
+PROJECT_ROOT = os.path.dirname(os.path.dirname(__file__))
+OHLCV_DIR = os.path.join(PROJECT_ROOT, "data", "ohlcv")
+
+st.set_page_config(page_title="DCA Simulator Panel", layout="wide")
+
+st.title("DCA Simulator — Spot + Perp Panel")
+
+with st.sidebar:
+    st.header("資金與模式設定")
+    spot_capital = st.number_input("現貨總投入 USD", min_value=0.0, value=1000.0, step=100.0, format="%.2f")
+    perp_capital = st.number_input("合約總投入 保證金 USD", min_value=0.0, value=1000.0, step=100.0, format="%.2f")
+    leverage = st.slider("合約槓桿 x", min_value=1, max_value=20, value=5)
+    funding_rate = st.number_input("假設 Funding Rate 每周期", value=0.0, format="%.6f")
+    fee_taker = st.number_input("手續費 Taker", value=0.0004, format="%.6f")
+    fee_maker = st.number_input("手續費 Maker", value=0.0002, format="%.6f")
+    st.markdown("---")
+    st.header("模擬參數")
+    rsi_threshold = st.slider("RSI Threshold", 20, 80, 50)
+    td_confirm = st.checkbox("啟用 TD 確認", value=True)
+    dca_ratio = st.slider("DCA Ratio", 0.05, 0.6, 0.2, step=0.01)
+    dca_spacing = st.slider("DCA Spacing", 0.005, 0.06, 0.02, step=0.001)
+    dca_max_steps = st.slider("DCA Max Steps", 1, 8, 3)
+
+st.subheader("選擇交易對")
+symbols = []
+if os.path.isdir(OHLCV_DIR):
+    for fname in os.listdir(OHLCV_DIR):
+        if fname.endswith("_5m.csv"):
+            sym = fname.replace("_5m.csv", "").replace("_", "/")
+            symbols.append(sym)
+symbols = sorted(list(set(symbols)))
+
+if not symbols:
+    st.warning("data/ohlcv 目錄空或沒有 *_5m.csv 檔案，請先下載 OHLCV。")
+else:
+    symbol = st.selectbox("Symbol", symbols, index=0)
+
+    st.markdown("### 模擬執行")
+    col1, col2 = st.columns(2)
+
+    with col1:
+        if st.button("執行 現貨 模擬 Spot"):
+            csv_path = os.path.join(OHLCV_DIR, symbol.replace("/", "_") + "_5m.csv")
+            if not os.path.exists(csv_path):
+                st.error(f"找不到 {csv_path}")
+            else:
+                df = pd.read_csv(csv_path, parse_dates=["datetime"], index_col="datetime")
+                pnl, maxdd, sharpe, equity = simulate_dca_strategy(
+                    df,
+                    rsi_threshold,
+                    td_confirm,
+                    dca_ratio,
+                    dca_spacing,
+                    dca_max_steps,
+                    mode="spot",
+                    initial_capital=spot_capital,
+                    fee_taker=fee_taker,
+                    fee_maker=fee_maker
+                )
+                st.metric("Spot PnL USD", f"{pnl:.2f}")
+                st.metric("Spot MaxDD %", f"{maxdd*100:.2f}%")
+                st.metric("Spot Sharpe", f"{sharpe:.3f}")
+                st.line_chart(pd.Series(equity, name="spot_equity"))
+
+    with col2:
+        if st.button("執行 合約 模擬 Perp Long"):
+            csv_path = os.path.join(OHLCV_DIR, symbol.replace("/", "_") + "_5m.csv")
+            if not os.path.exists(csv_path):
+                st.error(f"找不到 {csv_path}")
+            else:
+                df = pd.read_csv(csv_path, parse_dates=["datetime"], index_col="datetime")
+                pnl, maxdd, sharpe, equity = simulate_dca_strategy(
+                    df,
+                    rsi_threshold,
+                    td_confirm,
+                    dca_ratio,
+                    dca_spacing,
+                    dca_max_steps,
+                    mode="perp_long",
+                    leverage=leverage,
+                    funding_rate=funding_rate,
+                    initial_capital=perp_capital,
+                    fee_taker=fee_taker,
+                    fee_maker=fee_maker
+                )
+                st.metric("Perp PnL USD", f"{pnl:.2f}")
+                st.metric("Perp MaxDD %", f"{maxdd*100:.2f}%")
+                st.metric("Perp Sharpe", f"{sharpe:.3f}")
+                st.line_chart(pd.Series(equity, name="perp_equity"))
+
+st.markdown("---")
+st.caption("注意 此面板為本地模擬介面 僅供回測與參數探索使用")

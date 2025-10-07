@@ -1,0 +1,11 @@
+{
+  "id": 1,
+  "strategy": "TD13+RSI",
+  "pnl": 2.5,
+  "sharpe": 1144.7160296266889,
+  "maxdd": 0.0,
+  "equity": [],
+  "trial_id": 1,
+  "created_at": "2025-09-28 04:09:51.809068",
+  "recommended_amount": 150.0
+}

@@ -1,0 +1,131 @@
+# execution_engine.py
+import time
+from datetime import datetime
+import csv
+import ccxt
+
+class ExecutionEngine:
+    def __init__(self, exchange=None, mode="simulate", base_capital=10000, stop_loss=0.05, take_profit=0.1):
+        """
+        exchange: ccxt 交易所物件 (如 ccxt.bybit() 或 ccxt.binance())
+        mode: "simulate" 模擬模式 / "live" 實盤模式
+        base_capital: 初始資金 (USDT)
+        stop_loss: 止損百分比 (0.05 = 5%)
+        take_profit: 止盈百分比 (0.1 = 10%)
+        """
+        self.exchange = exchange
+        self.mode = mode
+        self.base_capital = base_capital
+        self.stop_loss = stop_loss
+        self.take_profit = take_profit
+        self.positions = {}  # symbol -> {"qty": float, "entry_price": float}
+        self.trade_log = []
+
+        # 載入交易所市場資訊 (實盤模式需要)
+        if self.exchange:
+            self.markets = self.exchange.load_markets()
+        else:
+            self.markets = {}
+
+    def _adjust_order_size(self, symbol, qty, price):
+        """調整數量符合交易所規格"""
+        if symbol not in self.markets:
+            return qty
+        market = self.markets[symbol]
+        min_qty = market.get("limits", {}).get("amount", {}).get("min", 0)
+        step_size = market.get("precision", {}).get("amount", None)
+
+        if min_qty and qty < min_qty:
+            qty = min_qty
+        if step_size:
+            qty = round(qty, step_size)
+        return qty
+
+    def execute_signal(self, symbol, side, price, capital_fraction=0.1):
+        """
+        執行交易訊號
+        side: "buy" 或 "sell"
+        price: 當前價格
+        capital_fraction: 單筆交易佔用資金比例
+        """
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        trade_size = self.base_capital * capital_fraction / price
+        trade_size = self._adjust_order_size(symbol, trade_size, price)
+
+        if self.mode == "simulate":
+            if side == "buy":
+                self.positions[symbol] = {"qty": trade_size, "entry_price": price}
+                self.trade_log.append((timestamp, symbol, side, price, trade_size, "SIM"))
+                print(f"🟢 模擬買入 {symbol} @ {price}, 數量={trade_size}")
+            elif side == "sell" and symbol in self.positions:
+                entry = self.positions.pop(symbol)
+                pnl = (price - entry["entry_price"]) * entry["qty"]
+                self.trade_log.append((timestamp, symbol, side, price, entry["qty"], round(pnl,2)))
+                print(f"🔴 模擬賣出 {symbol} @ {price}, PnL={round(pnl,2)}")
+
+        else:  # live 模式
+            if not self.exchange:
+                raise ValueError("❌ exchange 尚未初始化")
+            order = self.exchange.create_order(symbol, "market", side, trade_size)
+            self.trade_log.append((timestamp, symbol, side, price, trade_size, "LIVE"))
+            print(f"✅ 已送出實盤訂單: {order}")
+
+    def risk_check(self, symbol, current_price):
+        """檢查止損 / 止盈條件"""
+        if symbol not in self.positions:
+            return
+        entry = self.positions[symbol]
+        change = (current_price - entry["entry_price"]) / entry["entry_price"]
+
+        if change <= -self.stop_loss:
+            print(f"⚠️ {symbol} 觸發止損 {self.stop_loss*100}%")
+            self.execute_signal(symbol, "sell", current_price)
+        elif change >= self.take_profit:
+            print(f"✅ {symbol} 觸發止盈 {self.take_profit*100}%")
+            self.execute_signal(symbol, "sell", current_price)
+
+    def close_all_positions(self, current_prices):
+        """平掉所有持倉"""
+        for symbol, pos in list(self.positions.items()):
+            price = current_prices.get(symbol, pos["entry_price"])
+            self.execute_signal(symbol, "sell", price)
+
+    def export_trades(self, filename="trade_log.csv"):
+        """匯出交易紀錄"""
+        with open(filename, "w", newline="", encoding="utf-8-sig") as f:
+            writer = csv.writer(f)
+            writer.writerow(["timestamp", "symbol", "side", "price", "qty", "extra"])
+            writer.writerows(self.trade_log)
+        print(f"📁 交易紀錄已存檔: {filename}")# BEGIN AUTOPATCH: retry/backoff + fill hook
+import time
+import functools
+
+def retry(max_attempts=3, base_delay=0.5, backoff_factor=2.0):
+    def deco(func):
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            delay = base_delay
+            for attempt in range(1, max_attempts+1):
+                try:
+                    return func(*args, **kwargs)
+                except Exception as e:
+                    if attempt == max_attempts:
+                        raise
+                    time.sleep(delay)
+                    delay *= backoff_factor
+        return wrapper
+    return deco
+
+def fill_order_callback(order_response, symbol, intended_qty):
+    """
+    Minimal fill mapping to feed position logger.
+    Adjust keys to match your execution response.
+    """
+    return {
+        "symbol": symbol,
+        "filled_qty": order_response.get("filled_qty", intended_qty) if isinstance(order_response, dict) else intended_qty,
+        "avg_price": order_response.get("avg_price") if isinstance(order_response, dict) else None,
+        "status": order_response.get("status", "unknown") if isinstance(order_response, dict) else "unknown",
+        "raw": order_response
+    }
+# END AUTOPATCH

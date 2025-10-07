@@ -1,0 +1,4 @@
+# 5 分鐘排程 (範例，視你用的排程器做調整)
+schedule:
+  - cron: "*/5 * * * *"
+    command: "bash scripts/run_optuna.py"

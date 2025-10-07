@@ -1,0 +1,11 @@
+{
+  "active": ["binance", "okx"],
+  "binance": {
+    "api_key": "YOUR_BINANCE_API_KEY",
+    "api_secret": "YOUR_BINANCE_API_SECRET"
+  },
+  "okx": {
+    "api_key": "YOUR_OKX_API_KEY",
+    "api_secret": "YOUR_OKX_API_SECRET"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "big_timeframe": "4H",
+  "small_timeframe": "5M",
+  "max_spots": 10,
+  "max_shorts": 5,
+  "dca_ratio": 0.2,
+  "dca_spacing": 0.02,
+  "dca_max_steps": 3,
+  "rsi_threshold": 50,
+  "td_confirm": true
+}

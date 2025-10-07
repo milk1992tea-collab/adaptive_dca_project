@@ -1,0 +1,131 @@
+﻿import csv, time, sys, argparse, subprocess, shlex, os, tempfile, random, string
+import os`nfrom datetime import datetime
+
+def load_config(path):
+    rows=[]
+    with open(path, newline='', encoding='utf8') as f:
+        first = f.readline()
+        if not first:
+            return rows
+        headers = [h.strip() for h in first.strip().split(',')]
+        for raw in csv.reader(f):
+            if not raw:
+                continue
+            data = {}
+            for i, h in enumerate(headers):
+                val = raw[i].strip() if i < len(raw) else ''
+                data[h] = val
+                data[h.lower()] = val
+            rows.append(data)
+    return rows
+
+def safe_log_open(path):
+    try:
+        return open(path, "a", encoding="utf8")
+    except Exception:
+        fallback = os.path.join(os.path.expanduser("~"), "AppData", "Local", "Temp", "live_eth_fallback_" + "".join(random.choices(string.ascii_lowercase+string.digits, k=6)) + ".log")
+        try:
+            return open(fallback, "a", encoding="utf8")
+        except Exception:
+            return None
+
+def call_backtester(symbol, strategy, tf, params_str, export_csv):
+    # ensure we pass string literals (not None)
+    sym = symbol or ""
+    strat = strategy or ""
+    tfv = tf or ""
+    cmd = f'python -u backtester.py --symbol "{sym}" --strategy "{strat}" --tf {tfv} --export_csv "{export_csv}" --params "{params_str}"'
+    proc = subprocess.run(cmd, shell=True, capture_output=True, text=True)
+    out = proc.stdout.strip()
+    err = proc.stderr.strip()
+    return proc.returncode, out, err
+
+def append_log_handle(handle, text):
+    if handle:
+        try:
+            handle.write(text + "\n")
+            handle.flush()
+            return True
+        except Exception:
+            return False
+    else:
+        try:
+            print(text)
+            return True
+        except Exception:
+            return False
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--config', required=True)
+    parser.add_argument('--mode', choices=['paper','live'], default='paper')
+    parser.add_argument('--interval', type=int, default=60, help='seconds between iterations')
+    parser.add_argument('--log-file', default='live_eth_paper.log')
+    args = parser.parse_args()
+
+    cfg = load_config(args.config)
+    if not cfg:
+        print("no config rows found", file=sys.stderr); sys.exit(2)
+
+    log_handle = safe_log_open(args.log_file)
+    ts0 = datetime.now().isoformat()
+    append_log_handle(log_handle, f"{ts0} runner started mode={args.mode} interval={args.interval}s config_rows={len(cfg)}")
+
+    try:
+        for r in cfg:
+            ts = datetime.now().isoformat()
+            # support both normalized and lowercase keys
+            strategy = r.get('strategy') or r.get('strategy'.lower()) or r.get('strategy'.upper()) or ''
+            symbol = r.get('symbol') or r.get('symbol'.lower()) or ''
+            tf = r.get('tf') or r.get('tf'.lower()) or r.get('timeframe') or ''
+            params_str = "initial_capital=1000"
+            export_csv = "runner_tmp_result.csv"
+
+            strategy_to_use = (strategy or '').replace('_eth_test','').replace('_test','').replace('_trial','');
+            rc, out, err = call_backtester(symbol, strategy_to_use, tf, params_str, export_csv)
+            # log what we actually called
+            line = f"{ts},{symbol},{strategy},{tf},{rc},{out.replace(chr(10),' ')}"
+            append_log_handle(log_handle, line)
+
+            try:
+                if os.path.exists(export_csv):
+                    with open(export_csv, newline='', encoding='utf8') as f:
+                        reader = csv.DictReader(f)
+                        first = next(reader, None)
+                    if first:
+                        monitor_line = {
+                            'timestamp': ts,
+                            'symbol': symbol,
+                            'strategy': strategy,
+                            'mode': args.mode,
+                            'open_positions': 0,
+                            'unrealized_pnl': first.get('total_pnl','0'),
+                            'realized_pnl': first.get('total_pnl','0'),
+                            'account_balance': 1000,
+                            'equity': 1000 + float(first.get('total_pnl','0')),
+                            'max_drawdown': first.get('max_drawdown','0'),
+                            'trades_today': first.get('trades','0'),
+                            'avg_slippage': 0.0,
+                            'last_error': ''
+                        }
+                        header = not os.path.exists('daily_monitor.csv')
+                        with open('daily_monitor.csv','a',newline='',encoding='utf8') as mf:
+                            w=csv.DictWriter(mf, fieldnames=list(monitor_line.keys()))
+                            if header: w.writeheader()
+                            w.writerow(monitor_line)
+            except Exception as e:
+                append_log_handle(log_handle, f"{ts},ERROR,monitor_fail,{e}")
+
+    finally:
+        if log_handle:
+            try:
+                log_handle.close()
+            except:
+                pass
+
+if __name__ == '__main__':
+    main()
+
+
+
+

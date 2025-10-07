@@ -1,0 +1,29 @@
+{
+  "strategy_name": "RSI_MACD_Live",
+  "parameters": {
+    "strategy_combo": "RSI+MACD",
+    "rsi_period": 15,
+    "rsi_buy": 26,
+    "rsi_sell": 73,
+    "dca_interval": 30
+  },
+  "risk_management": {
+    "initial_capital": 1000,
+    "max_leverage": 1,
+    "position_sizing": "fixed", 
+    "stop_loss": null,
+    "take_profit": null
+  },
+  "execution": {
+    "exchange": "binance",
+    "quote_asset": "USDT",
+    "symbols": "top_50_volume", 
+    "timeframe": "1h",
+    "mode": "live"
+  },
+  "logging": {
+    "save_trades": true,
+    "save_signals": true,
+    "log_level": "INFO"
+  }
+}

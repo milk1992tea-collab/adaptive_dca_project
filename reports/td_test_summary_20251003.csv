@@ -1,0 +1,11 @@
+metric,value
+total_signals,2
+
+top_symbols,count,avg_strength
+ETH/USDT:USDT,2,0.8
+
+day,count
+2025-10-03,2
+
+td_count,count
+9,2

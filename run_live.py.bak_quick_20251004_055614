@@ -1,0 +1,60 @@
+﻿# service daemon wrapper for run_live.py
+import time
+import logging
+import traceback
+import subprocess
+from datetime import datetime
+
+# 若你的啟動函式不是 main，請把 main() 換成實際名稱
+# from your_module import main
+
+logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s %(message)s")
+
+def sanitize_for_log(s):
+    try:
+        if s is None:
+            return ''
+        value = str(s)
+        # 移除常見的 escape 文字序列
+        value = value.replace('\\r', '')
+        value = value.replace('\\n', '')
+        value = value.replace('
+', '')
+        value = value.replace('\\\\
+', '')
+        return value
+    except Exception:
+        return str(s)
+
+def safe_git(cmd_args):
+    try:
+        out = subprocess.check_output(cmd_args, stderr=subprocess.STDOUT, shell=False)
+        return out.decode("utf8", errors="ignore").strip()
+    except Exception:
+        return ""
+
+def _service_main_loop():
+    while True:
+        try:
+            main()  # 若名稱不同請改成實際啟動函式
+        except Exception as exc:
+            logging.exception("Unhandled exception in service main loop: %s", exc)
+            logging.error(traceback.format_exc())
+            time.sleep(10)
+        time.sleep(1)
+
+def _graceful_run():
+    try:
+        _service_main_loop()
+    except KeyboardInterrupt:
+        logging.info("Service interrupted by KeyboardInterrupt, exiting gracefully")
+    except SystemExit:
+        logging.info("Service received SystemExit, exiting gracefully")
+    except Exception:
+        logging.exception("Unexpected exception in graceful runner")
+    finally:
+        logging.info("Service stopped")
+
+if __name__ == "__main__":
+    _graceful_run()
+

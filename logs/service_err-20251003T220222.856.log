@@ -1,0 +1,4 @@
+  File "C:\Users\unive\Desktop\v_infinity\adaptive_dca_ai\run_live.py", line 20
+    value = value.replace('
+                          ^
+SyntaxError: unterminated string literal (detected at line 20)

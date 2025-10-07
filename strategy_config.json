@@ -1,0 +1,19 @@
+{
+  "mode": "spot",
+  "total_usdt": 1000,
+  "usable_ratio": 0.8,
+  "max_holdings": 10,
+  "max_adds": 3,
+  "price_step_pct": 0.02,
+  "amount_multiplier": 1.3,
+  "take_profit_pct": 0.05,
+  "per_asset_stop_loss_percent": 0.30,
+  "portfolio_stop_loss_percent": null,
+  "min_order_size": 10,
+  "reserve_ratio": 0.2,
+  "dry_run": true,
+  "single_instance_lock": true,
+  "logging": {
+    "level": "INFO"
+  }
+}

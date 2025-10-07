@@ -1,0 +1,2 @@
+strategy,symbol,tf,initial_capital_pct,per_trade_max_loss_pct,daily_stop_loss_pct,max_daily_new_trades
+hybrid_mix,ETH/USDT:USDT,5m,0.005,0.002,0.02,5

@@ -1,0 +1,2 @@
+symbol,strategy,timeframe,total_pnl,max_drawdown,sharpe_ratio,trades
+ETH/USDT:USDT,hybrid_mix,5m,57.62773439240641,0.016620624065938946,4.856020829533062,9

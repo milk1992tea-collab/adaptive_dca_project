@@ -1,0 +1,322 @@
+[
+  {
+    "symbol": "BTC/USDT:USDT",
+    "timeframe": "5m",
+    "strategy": "hybrid_mix",
+    "signal": "hold",
+    "score": 0.0,
+    "params": {}
+  },
+  {
+    "symbol": "BTC/USDT:USDT",
+    "timeframe": "15m",
+    "strategy": "hybrid_mix",
+    "signal": "hold",
+    "score": 0.0,
+    "params": {}
+  },
+  {
+    "symbol": "BTC/USDT:USDT",
+    "timeframe": "1h",
+    "strategy": "hybrid_mix",
+    "signal": "hold",
+    "score": 0.0,
+    "params": {}
+  },
+  {
+    "symbol": "BTC/USDT:USDT",
+    "timeframe": "4h",
+    "strategy": "hybrid_mix",
+    "signal": "hold",
+    "score": 0.0,
+    "params": {}
+  },
+  {
+    "symbol": "ETH/USDT:USDT",
+    "timeframe": "5m",
+    "strategy": "hybrid_mix",
+    "signal": "hold",
+    "score": 0.0,
+    "params": {}
+  },
+  {
+    "symbol": "ETH/USDT:USDT",
+    "timeframe": "15m",
+    "strategy": "hybrid_mix",
+    "signal": "hold",
+    "score": 0.0,
+    "params": {}
+  },
+  {
+    "symbol": "ETH/USDT:USDT",
+    "timeframe": "1h",
+    "strategy": "hybrid_mix",
+    "signal": "hold",
+    "score": 0.0,
+    "params": {}
+  },
+  {
+    "symbol": "ETH/USDT:USDT",
+    "timeframe": "4h",
+    "strategy": "hybrid_mix",
+    "signal": "hold",
+    "score": 0.0,
+    "params": {}
+  },
+  {
+    "symbol": "SOL/USDT:USDT",
+    "timeframe": "5m",
+    "strategy": "hybrid_mix",
+    "signal": "hold",
+    "score": 0.0,
+    "params": {}
+  },
+  {
+    "symbol": "SOL/USDT:USDT",
+    "timeframe": "15m",
+    "strategy": "hybrid_mix",
+    "signal": "hold",
+    "score": 0.0,
+    "params": {}
+  },
+  {
+    "symbol": "SOL/USDT:USDT",
+    "timeframe": "1h",
+    "strategy": "hybrid_mix",
+    "signal": "hold",
+    "score": 0.0,
+    "params": {}
+  },
+  {
+    "symbol": "SOL/USDT:USDT",
+    "timeframe": "4h",
+    "strategy": "hybrid_mix",
+    "signal": "hold",
+    "score": 0.0,
+    "params": {}
+  },
+  {
+    "symbol": "XPL/USDT:USDT",
+    "timeframe": "5m",
+    "strategy": "hybrid_mix",
+    "signal": "hold",
+    "score": 0.0,
+    "params": {}
+  },
+  {
+    "symbol": "XPL/USDT:USDT",
+    "timeframe": "15m",
+    "strategy": "hybrid_mix",
+    "signal": "hold",
+    "score": 0.0,
+    "params": {}
+  },
+  {
+    "symbol": "XPL/USDT:USDT",
+    "timeframe": "1h",
+    "strategy": "hybrid_mix",
+    "signal": "hold",
+    "score": 0.0,
+    "params": {}
+  },
+  {
+    "symbol": "XPL/USDT:USDT",
+    "timeframe": "4h",
+    "strategy": "hybrid_mix",
+    "signal": "hold",
+    "score": 0.0,
+    "params": {}
+  },
+  {
+    "symbol": "XRP/USDT:USDT",
+    "timeframe": "5m",
+    "strategy": "hybrid_mix",
+    "signal": "hold",
+    "score": 0.0,
+    "params": {}
+  },
+  {
+    "symbol": "XRP/USDT:USDT",
+    "timeframe": "15m",
+    "strategy": "hybrid_mix",
+    "signal": "hold",
+    "score": 0.0,
+    "params": {}
+  },
+  {
+    "symbol": "XRP/USDT:USDT",
+    "timeframe": "1h",
+    "strategy": "hybrid_mix",
+    "signal": "hold",
+    "score": 0.0,
+    "params": {}
+  },
+  {
+    "symbol": "XRP/USDT:USDT",
+    "timeframe": "4h",
+    "strategy": "hybrid_mix",
+    "signal": "hold",
+    "score": 0.0,
+    "params": {}
+  },
+  {
+    "symbol": "DOGE/USDT:USDT",
+    "timeframe": "5m",
+    "strategy": "hybrid_mix",
+    "signal": "hold",
+    "score": 0.0,
+    "params": {}
+  },
+  {
+    "symbol": "DOGE/USDT:USDT",
+    "timeframe": "15m",
+    "strategy": "hybrid_mix",
+    "signal": "hold",
+    "score": 0.0,
+    "params": {}
+  },
+  {
+    "symbol": "DOGE/USDT:USDT",
+    "timeframe": "1h",
+    "strategy": "hybrid_mix",
+    "signal": "hold",
+    "score": 0.0,
+    "params": {}
+  },
+  {
+    "symbol": "DOGE/USDT:USDT",
+    "timeframe": "4h",
+    "strategy": "hybrid_mix",
+    "signal": "hold",
+    "score": 0.0,
+    "params": {}
+  },
+  {
+    "symbol": "ASTER/USDT:USDT",
+    "timeframe": "5m",
+    "strategy": "hybrid_mix",
+    "signal": "hold",
+    "score": 0.0,
+    "params": {}
+  },
+  {
+    "symbol": "ASTER/USDT:USDT",
+    "timeframe": "15m",
+    "strategy": "hybrid_mix",
+    "signal": "hold",
+    "score": 0.0,
+    "params": {}
+  },
+  {
+    "symbol": "ASTER/USDT:USDT",
+    "timeframe": "1h",
+    "strategy": "hybrid_mix",
+    "signal": "hold",
+    "score": 0.0,
+    "params": {}
+  },
+  {
+    "symbol": "ASTER/USDT:USDT",
+    "timeframe": "4h",
+    "strategy": "hybrid_mix",
+    "signal": "hold",
+    "score": 0.0,
+    "params": {}
+  },
+  {
+    "symbol": "ALPINE/USDT:USDT",
+    "timeframe": "5m",
+    "strategy": "hybrid_mix",
+    "signal": "hold",
+    "score": 0.0,
+    "params": {}
+  },
+  {
+    "symbol": "ALPINE/USDT:USDT",
+    "timeframe": "15m",
+    "strategy": "hybrid_mix",
+    "signal": "hold",
+    "score": 0.0,
+    "params": {}
+  },
+  {
+    "symbol": "ALPINE/USDT:USDT",
+    "timeframe": "1h",
+    "strategy": "hybrid_mix",
+    "signal": "hold",
+    "score": 0.0,
+    "params": {}
+  },
+  {
+    "symbol": "ALPINE/USDT:USDT",
+    "timeframe": "4h",
+    "strategy": "hybrid_mix",
+    "signal": "hold",
+    "score": 0.0,
+    "params": {}
+  },
+  {
+    "symbol": "PUMPFUN/USDT:USDT",
+    "timeframe": "5m",
+    "strategy": "hybrid_mix",
+    "signal": "hold",
+    "score": 0.0,
+    "params": {}
+  },
+  {
+    "symbol": "PUMPFUN/USDT:USDT",
+    "timeframe": "15m",
+    "strategy": "hybrid_mix",
+    "signal": "hold",
+    "score": 0.0,
+    "params": {}
+  },
+  {
+    "symbol": "PUMPFUN/USDT:USDT",
+    "timeframe": "1h",
+    "strategy": "hybrid_mix",
+    "signal": "hold",
+    "score": 0.0,
+    "params": {}
+  },
+  {
+    "symbol": "PUMPFUN/USDT:USDT",
+    "timeframe": "4h",
+    "strategy": "hybrid_mix",
+    "signal": "hold",
+    "score": 0.0,
+    "params": {}
+  },
+  {
+    "symbol": "FARTCOIN/USDT:USDT",
+    "timeframe": "5m",
+    "strategy": "hybrid_mix",
+    "signal": "hold",
+    "score": 0.0,
+    "params": {}
+  },
+  {
+    "symbol": "FARTCOIN/USDT:USDT",
+    "timeframe": "15m",
+    "strategy": "hybrid_mix",
+    "signal": "hold",
+    "score": 0.0,
+    "params": {}
+  },
+  {
+    "symbol": "FARTCOIN/USDT:USDT",
+    "timeframe": "1h",
+    "strategy": "hybrid_mix",
+    "signal": "hold",
+    "score": 0.0,
+    "params": {}
+  },
+  {
+    "symbol": "FARTCOIN/USDT:USDT",
+    "timeframe": "4h",
+    "strategy": "hybrid_mix",
+    "signal": "hold",
+    "score": 0.0,
+    "params": {}
+  }
+]
