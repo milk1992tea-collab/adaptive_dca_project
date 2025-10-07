@@ -28,8 +28,8 @@ class MACross(Strategy):
 
     def init(self):
         # Use a lambda so Backtesting.I receives a pandas Series and rolling works correctly
-        self.ma1 = self.I(lambda s, n: s.rolling(n).mean(), self.data.Close, self.n1)
-        self.ma2 = self.I(lambda s, n: s.rolling(n).mean(), self.data.Close, self.n2)
+        self.ma1 = self.I(lambda s, n: pd.Series(s).rolling(n).mean().to_numpy(), self.data.Close, self.n1)
+        self.ma2 = self.I(lambda s, n: pd.Series(s).rolling(n).mean().to_numpy(), self.data.Close, self.n2)
 
     def next(self):
         if crossover(self.ma1, self.ma2):
@@ -140,3 +140,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
