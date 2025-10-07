@@ -18,32 +18,37 @@ jobs:
         with:
           python-version: '3.11'
 
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
       - name: Install deps
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt || true
+          pip install --prefer-binary -r requirements.txt
 
       - name: Run backtest and produce plot
         run: |
-          # 嘗試以預期位置執行回測腳本
+          # 優先執行實際腳本；若不存在則退出失敗避免上傳測試檔
           if [ -f "./run_backtest.py" ]; then
-            python ./run_backtest.py --output bt_plot.html || python ./run_backtest.py
+            python ./run_backtest.py --output bt_plot.html
           elif [ -f "./tools/run_backtest.py" ]; then
-            python ./tools/run_backtest.py --output bt_plot.html || python ./tools/run_backtest.py
+            python ./tools/run_backtest.py --output bt_plot.html
           else
-            echo "run_backtest.py not found; listing files for debugging:"
-            ls -la
-            find . -maxdepth 4 -type f -name "run_backtest.py" -print || true
-            # 建立 smoke-test bt_plot.html 以驗證 artifact 流程
-            echo "<html><body><h1>Backtest smoke test</h1></body></html>" > bt_plot.html
-            echo "Created smoke-test bt_plot.html"
+            echo "ERROR: run_backtest.py not found in expected locations" >&2
+            echo "Searched: ./run_backtest.py and ./tools/run_backtest.py" >&2
+            exit 1
           fi
 
           if [ -f bt_plot.html ]; then
             echo "bt_plot.html ready, size:"
             stat -c "%s bytes" bt_plot.html || ls -la bt_plot.html
           else
-            echo "ERROR: bt_plot.html missing" >&2
+            echo "ERROR: bt_plot.html missing after running backtest" >&2
             exit 2
           fi
 
@@ -54,12 +59,7 @@ jobs:
 
       - name: Rename plot with commit and ts
         run: |
-          if [ -f bt_plot.html ]; then
-            mv bt_plot.html backtest-${{ env.COMMIT }}-${{ env.TS }}.html
-          else
-            echo "bt_plot.html not found" >&2
-            exit 1
-          fi
+          mv bt_plot.html backtest-${{ env.COMMIT }}-${{ env.TS }}.html
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
