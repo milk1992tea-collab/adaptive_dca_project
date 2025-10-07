@@ -1,0 +1,41 @@
+# fetchers/turnover_adapter.py
+import logging
+import time
+from typing import Optional
+import pandas as pd
+
+logger = logging.getLogger("turnover_adapter")
+logger.setLevel(logging.INFO)
+if not logger.handlers:
+    import sys
+    ch = logging.StreamHandler(sys.stdout)
+    ch.setFormatter(logging.Formatter("%(asctime)s %(levelname)s %(message)s"))
+    logger.addHandler(ch)
+
+below_importable_mod = '<your.module.path>'
+
+def _proxy_turnover_from_mktcap(n=20):
+    try:
+        from fetchers.mktcap_fetcher import fetch_marketcap_top
+    except Exception:
+        logger.warning("mktcap_fetcher not available for turnover proxy")
+        return pd.DataFrame(columns=['ticker','name','turnover'])
+    mdf = fetch_marketcap_top(n)
+    if 'marketcap' not in mdf.columns:
+        return pd.DataFrame(columns=['ticker','name','turnover'])
+    mdf = mdf.copy()
+    mdf['turnover'] = mdf['marketcap'] * 0.001
+    return mdf[['ticker','name','turnover']]
+
+def fetch_turnover_top(n=20) -> pd.DataFrame:
+    if below_importable_mod:
+        try:
+            mod = __import__(below_importable_mod, fromlist=['*'])
+            if hasattr(mod, 'get_turnover_top'):
+                df = mod.get_turnover_top(n)
+                logger.info("turnover_adapter: used real provider %s", below_importable_mod)
+                return df[['ticker','name','turnover']]
+        except Exception as e:
+            logger.warning("turnover_adapter: real provider failed: %s", e)
+    logger.info("turnover_adapter: using proxy turnover from mktcap")
+    return _proxy_turnover_from_mktcap(n)
