@@ -2,3 +2,7 @@
 
 # local credentials
 config/credentials.json
+.vscode/
+bt_plot.html
+minimal_agent.py.bak_*
+*.bak_*
