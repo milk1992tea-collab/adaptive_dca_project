@@ -1,0 +1,37 @@
+﻿name: Backtest and Artifacts
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  backtest:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        shell: powershell
+        run: |
+          python -m pip install --upgrade pip
+          if (Test-Path requirements.txt) { python -m pip install -r requirements.txt } else { python -m pip install pandas numpy matplotlib }
+
+      - name: Run backtest
+        shell: powershell
+        run: |
+          python minimal_agent.py --mode backtest --data ohlcv.csv --n1 10 --n2 30
+
+      - name: Upload bt_plot.html artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: backtest-plot
+          path: bt_plot.html
