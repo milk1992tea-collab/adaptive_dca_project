@@ -1,5 +1,9 @@
 ﻿name: Backtest and Publish
 
+permissions:
+  contents: write
+  pages: write
+
 on:
   push:
   workflow_dispatch:
