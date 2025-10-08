@@ -11,16 +11,20 @@ on:
 jobs:
   backtest:
     runs-on: ubuntu-latest
+    outputs:
+      commit_sha: ${{ steps.set_commit.outputs.commit_sha }}
     steps:
       - uses: actions/checkout@v4
-      - name: produce dummy artifact
+      - name: produce artifact (replace with real backtest)
         run: |
           mkdir -p out
-          echo "<html>ok</html>" > out/backtest-latest.html
-          convert -size 100x50 xc:white out/backtest-latest.png 2>/dev/null || true
+          # replace the following with your real backtest commands that produce files in out/
+          echo "<html>backtest result</html>" > out/backtest-latest.html
+          convert -size 320x120 xc:white out/backtest-latest.png 2>/dev/null || true
       - name: Set backtest job output commit
         id: set_commit
         run: |
+          # write short SHA (first 8 chars) to job output
           echo "commit_sha=${GITHUB_SHA:0:8}" >> $GITHUB_OUTPUT
 
   publish:
@@ -39,7 +43,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          # If remote branch exists, fetch and base worktree on remote; otherwise init once
+          # Ensure remote branch exists or initialize it
           if git ls-remote --exit-code --heads origin "$PUBLISH_BRANCH" >/dev/null 2>&1; then
             git fetch origin "$PUBLISH_BRANCH:$PUBLISH_BRANCH"
           else
@@ -75,4 +79,3 @@ jobs:
           popd >/dev/null
           git worktree remove "$TMPDIR" --force || true
           rm -rf "$TMPDIR"
-
