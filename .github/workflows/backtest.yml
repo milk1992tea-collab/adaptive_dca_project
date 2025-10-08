@@ -1,7 +1,8 @@
 ﻿on:
   push:
-  workflow_dispatch:
-
+    branches:
+      - main
+  workflow_dispatch: {}
 name: Backtest and Publish
 
 permissions:
@@ -178,6 +179,7 @@ PY
           git worktree remove "$TMPDIR" --force || true
           rm -rf "$TMPDIR"
         shell: bash
+
 
 
 
