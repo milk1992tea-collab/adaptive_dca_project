@@ -1,4 +1,8 @@
-﻿name: Backtest and Artifacts
+﻿on:
+  workflow_dispatch: {}
+  push:
+    branches: [ main ]
+name: Backtest and Artifacts
 
 on:
   push:
@@ -57,6 +61,7 @@ jobs:
         with:
           name: backtest-plot-${{ env.COMMIT }}-${{ env.TS }}
           path: backtest-*.html;backtest-*.png
+
 
 
 
