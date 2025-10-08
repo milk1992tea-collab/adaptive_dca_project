@@ -6,3 +6,11 @@ config/credentials.json
 bt_plot.html
 minimal_agent.py.bak_*
 *.bak_*
+# local backups and temp artifacts
+.git_backups_*
+artifacts/
+tmp/
+backtest.yml.decoded
+bt_plot.*
+*.bak
+*.decoded
