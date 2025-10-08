@@ -32,3 +32,4 @@ backtest-*.html
 run_*.json
 jobs_result.txt
 collect_done.txt
+backups_local/
