@@ -15,3 +15,11 @@ bt_plot.*
 *.bak
 *.decoded
 diagnostic/
+# local backups and logs
+.git-backup-*/
+*.bak
+*.log
+backtest-*.html
+run_*.json
+jobs_result.txt
+.collect_done.txt
