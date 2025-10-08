@@ -98,3 +98,37 @@ jobs:
             **/debug_workspace_list.txt
             **/debug-alive.txt
           if-no-files-found: warn
+  # Publish backtest artifacts to gh-pages (Windows runner)
+  - name: Publish backtest artifacts to gh-pages (Windows)
+    if: always()
+    shell: pwsh
+    env:
+      PUBLISH_BRANCH: gh-pages
+      TARGET_DIR: backtests/${{ github.sha }}
+    run: |
+      git config user.name "github-actions[bot]"
+      git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+      $publish = "${{ env.PUBLISH_BRANCH }}"
+      $target = "${{ env.TARGET_DIR }}"
+      git fetch origin $publish:$publish 2>$null || git checkout --orphan $publish
+      $tmp = Join-Path $env:TEMP "artifacts"
+      if (Test-Path $tmp) { Remove-Item -Recurse -Force $tmp }
+      git worktree add $tmp $publish
+      $outDir = Join-Path $tmp $target
+      New-Item -ItemType Directory -Path $outDir -Force | Out-Null
+      Copy-Item -Path "bt_plot.html" -Destination (Join-Path $outDir "backtest-latest.html") -ErrorAction SilentlyContinue
+      Copy-Item -Path "bt_plot.png"  -Destination (Join-Path $outDir "backtest-latest.png") -ErrorAction SilentlyContinue
+      Copy-Item -Path "backtest-*.png" -Destination $outDir -Recurse -ErrorAction SilentlyContinue
+      Copy-Item -Path "backtest-*.html" -Destination $outDir -Recurse -ErrorAction SilentlyContinue
+      Copy-Item -Path "debug-*.txt" -Destination $outDir -Recurse -ErrorAction SilentlyContinue
+      Push-Location $tmp
+      git add -A
+      if (-not (git diff --staged --quiet)) {
+        git commit -m "ci: publish backtest artifacts for $GITHUB_SHA"
+        git push "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}" $publish
+        Write-Output "Published artifacts to branch $publish at $target"
+      } else {
+        Write-Output "No artifact changes to publish"
+      }
+      Pop-Location
+      git worktree remove $tmp --force
