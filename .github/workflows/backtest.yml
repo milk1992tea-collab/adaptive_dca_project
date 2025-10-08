@@ -62,29 +62,8 @@ jobs:
             echo "No backtest-*.png found to canonicalize" >&2
           fi
 
-      - name: Dump workspace and debug files (always)
-        if: ${{ always() }}
-        shell: bash
-        run: |
-          set -euxo pipefail
-          WORKDIR="${GITHUB_WORKSPACE:-$PWD}"
-          echo "WORKDIR=$WORKDIR" > debug_workspace_list.txt
-          ls -la "$WORKDIR" >> debug_workspace_list.txt 2>&1 || true
-          find "$WORKDIR" -maxdepth 2 -type f \( -name "bt_plot.*" -o -name "backtest-*.html" -o -name "backtest-*.png" -o -name "backtest-latest.*" \) -printf "%p %s bytes\n" >> debug_workspace_list.txt 2>&1 || true
-          if [ -f "$WORKDIR/bt_plot.html" ]; then head -n 120 "$WORKDIR/bt_plot.html" >> debug_workspace_list.txt || true; fi
-          ls -la /proc/self/fd >> debug_workspace_list.txt 2>&1 || true
 
-      - name: Force debug artifact (always)
-        if: ${{ always() }}
-        shell: bash
-        run: |
-          set -euxo pipefail
-          WORKDIR="${GITHUB_WORKSPACE:-$PWD}"
-          echo "run_id: $GITHUB_RUN_ID" > "$WORKDIR/debug-alive.txt" || true
-          echo "head_sha: $GITHUB_SHA" >> "$WORKDIR/debug-alive.txt" || true
-          date -u >> "$WORKDIR/debug-alive.txt" || true
-
-      - name: Upload artifact
+            - name: Upload artifact
         if: ${{ always() }}
         uses: actions/upload-artifact@v4
         with:
@@ -94,7 +73,4 @@ jobs:
             **/backtest-*.png
             **/backtest-latest.html
             **/backtest-latest.png
-            **/bt_plot.*
-            **/debug_workspace_list.txt
-            **/debug-alive.txt
           if-no-files-found: warn
