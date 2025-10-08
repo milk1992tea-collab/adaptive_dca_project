@@ -4,9 +4,6 @@ on:
   push:
   workflow_dispatch:
 
-# 以下保留你原有的其他設定（jobs: 等）
-
-
 jobs:
   backtest:
     runs-on: ubuntu-latest
@@ -36,7 +33,11 @@ jobs:
           if git show-ref --verify --quiet refs/heads/$PUBLISH_BRANCH; then
             git fetch origin $PUBLISH_BRANCH:$PUBLISH_BRANCH
           else
-            try { git fetch origin } catch { Write-Output "git fetch failed but continuing" }
+            if git fetch origin; then
+              echo "fetched origin"
+            else
+              echo "git fetch failed but continuing"
+            fi
             git checkout --orphan $PUBLISH_BRANCH
             git rm -rf .
             git commit --allow-empty -m "init $PUBLISH_BRANCH"
