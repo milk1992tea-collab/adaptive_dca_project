@@ -1,4 +1,12 @@
-﻿# run_backtest.py - simple SMA crossover backtest -> writes bt_plot.html
+﻿import sys, os
+# CI debug marker — will show in workflow logs and in output HTML
+print("SCRIPT_DEBUG:BEGIN")
+print("SCRIPT_PATH:", __file__)
+print("PYARGS:", sys.argv)
+print("CWD:", os.getcwd())
+print("ENV_COMMIT:", os.environ.get("COMMIT"))
+print("SCRIPT_DEBUG:END")
+# run_backtest.py - simple SMA crossover backtest -> writes bt_plot.html
 import sys
 from pathlib import Path
 import pandas as pd
@@ -72,3 +80,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
