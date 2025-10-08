@@ -34,37 +34,40 @@ jobs:
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          if git show-ref --verify --quiet refs/heads/$PUBLISH_BRANCH; then
-            git fetch origin $PUBLISH_BRANCH:$PUBLISH_BRANCH
+
+          # If remote branch exists, fetch and base worktree on remote; otherwise init once
+          if git ls-remote --exit-code --heads origin "$PUBLISH_BRANCH" >/dev/null 2>&1; then
+            git fetch origin "$PUBLISH_BRANCH:$PUBLISH_BRANCH"
           else
-            if git fetch origin; then
-              echo "fetched origin"
-            else
-              echo "git fetch failed but continuing"
-            fi
-            git checkout --orphan $PUBLISH_BRANCH
+            git checkout --orphan "$PUBLISH_BRANCH"
             git rm -rf .
             git commit --allow-empty -m "init $PUBLISH_BRANCH"
-            git push origin $PUBLISH_BRANCH
-            git checkout -f $GITHUB_REF
+            git push origin "$PUBLISH_BRANCH"
+            git checkout -f "$GITHUB_REF" || true
           fi
+
           TMPDIR=$(mktemp -d)
-          git worktree add "$TMPDIR" $PUBLISH_BRANCH
+          git worktree add "$TMPDIR" "$PUBLISH_BRANCH"
+
           mkdir -p "$TMPDIR/$TARGET_DIR"
           cp -v out/backtest-latest.html "$TMPDIR/$TARGET_DIR/" 2>/dev/null || true
           cp -v out/backtest-latest.png  "$TMPDIR/$TARGET_DIR/" 2>/dev/null || true
           cp -v out/backtest-*.html "$TMPDIR/$TARGET_DIR/" 2>/dev/null || true
           cp -v out/backtest-*.png  "$TMPDIR/$TARGET_DIR/" 2>/dev/null || true
           cp -v out/debug-*.txt      "$TMPDIR/$TARGET_DIR/" 2>/dev/null || true
+
           pushd "$TMPDIR" >/dev/null
+          git fetch origin "$PUBLISH_BRANCH" || true
+          git reset --mixed "origin/$PUBLISH_BRANCH" || true
+
           git add -A
           if ! git diff --staged --quiet; then
             git commit -m "ci: publish backtest artifacts for $GITHUB_SHA"
-            git push "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}" $PUBLISH_BRANCH
+            git push "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}" "$PUBLISH_BRANCH"
             echo "Published artifacts to $PUBLISH_BRANCH/$TARGET_DIR"
           else
             echo "No artifact changes to publish"
           fi
           popd >/dev/null
-          git worktree remove "$TMPDIR" --force
+          git worktree remove "$TMPDIR" --force || true
           rm -rf "$TMPDIR"
