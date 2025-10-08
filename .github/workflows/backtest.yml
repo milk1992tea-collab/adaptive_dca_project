@@ -9,7 +9,7 @@ permissions:
   contents: write
   pages: write
 concurrency:
-  group: backtest-`${{ github.ref }}`
+  group: backtest-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
@@ -179,6 +179,7 @@ PY
           git worktree remove "$TMPDIR" --force || true
           rm -rf "$TMPDIR"
         shell: bash
+
 
 
 
