@@ -1,0 +1,2 @@
+﻿New-Item -ItemType Directory -Force -Path .github\workflows | Out-Null; Set-Content -Path .github\workflows\_tmp-dispatch.yml -Value (Get-Clipboard) -Encoding UTF8; Write-Output "wrote .github/workflows/_tmp-dispatch.yml"
+
