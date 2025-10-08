@@ -76,16 +76,14 @@ jobs:
           git fetch origin "$PUBLISH_BRANCH" || true
           git reset --mixed "origin/$PUBLISH_BRANCH" || true
 
-          # commit even if no content change (allow-empty)
           git add -A
           if ! git diff --staged --quiet; then
             git commit -m "ci: publish backtest artifacts for $GITHUB_SHA"
+            git push "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}" "$PUBLISH_BRANCH"
+            echo "Published artifacts to $PUBLISH_BRANCH/$TARGET_DIR"
           else
-            git commit --allow-empty -m "ci: publish backtest artifacts for $GITHUB_SHA (no content change)"
+            echo "No artifact changes to publish"
           fi
-          git push "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}" "$PUBLISH_BRANCH"
-          echo "Published artifacts to $PUBLISH_BRANCH/$TARGET_DIR"
-
           popd >/dev/null
           git worktree remove "$TMPDIR" --force || true
           rm -rf "$TMPDIR"
