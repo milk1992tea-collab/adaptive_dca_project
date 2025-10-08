@@ -62,7 +62,32 @@ jobs:
       echo "No backtest-*.png found to canonicalize" >&2
     fi
 
-- name: Upload artifact
+      - name: Dump workspace and debug files (always)
+        if: ${{ always() }}
+        shell: bash
+        run: |
+          set -euxo pipefail
+          WORKDIR="${GITHUB_WORKSPACE:-$PWD}"
+          echo "WORKDIR=$WORKDIR"
+          echo "--- ls -la WORKDIR root ---" > debug_workspace_list.txt
+          ls -la "$WORKDIR" >> debug_workspace_list.txt 2>&1 || true
+          echo "--- find candidate files (maxdepth2) ---" >> debug_workspace_list.txt
+          find "$WORKDIR" -maxdepth 2 -type f \( -name "bt_plot.*" -o -name "backtest-*.html" -o -name "backtest-*.png" -o -name "backtest-latest.*" \) -printf "%p %s bytes\n" >> debug_workspace_list.txt 2>&1 || true
+          echo "--- tail of bt_plot.html if exists ---" >> debug_workspace_list.txt
+          if [ -f "$WORKDIR/bt_plot.html" ]; then tail -n +1 "$WORKDIR/bt_plot.html" | sed -n "1,120p" >> debug_workspace_list.txt || true; fi
+          echo "--- ls /proc/self/fd (for debug) ---" >> debug_workspace_list.txt
+          ls -la /proc/self/fd >> debug_workspace_list.txt 2>&1 || true
+      - name: Upload artifact
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: backtest-plot
+          path: |
+            **/backtest-*.html
+            **/backtest-*.png
+            **/backtest-latest.html
+            **/backtest-latest.png
+          if-no-files-found: warn
         uses: actions/upload-artifact@v4
         with:
           name: backtest-plot
@@ -70,4 +95,5 @@ jobs:
             **/backtest-*.html
             **/backtest-*.png
           if-no-files-found: warn
+
 
