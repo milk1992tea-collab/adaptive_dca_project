@@ -27,12 +27,25 @@ jobs:
           # write short SHA (first 8 chars) to job output
           echo "commit_sha=${GITHUB_SHA:0:8}" >> $GITHUB_OUTPUT
 
+      - name: Upload backtest artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: backtest-out-${{ steps.set_commit.outputs.commit_sha }}
+          path: out
+
   publish:
     needs: backtest
     runs-on: ubuntu-latest
     if: always()
     steps:
       - uses: actions/checkout@v4
+
+      - name: Download backtest artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: backtest-out-${{ needs.backtest.outputs.commit_sha }}
+          path: downloaded_out
+
       - name: Publish backtest artifacts to gh-pages
         if: always()
         env:
@@ -58,11 +71,8 @@ jobs:
           git worktree add "$TMPDIR" "$PUBLISH_BRANCH"
 
           mkdir -p "$TMPDIR/$TARGET_DIR"
-          cp -v out/backtest-latest.html "$TMPDIR/$TARGET_DIR/" 2>/dev/null || true
-          cp -v out/backtest-latest.png  "$TMPDIR/$TARGET_DIR/" 2>/dev/null || true
-          cp -v out/backtest-*.html "$TMPDIR/$TARGET_DIR/" 2>/dev/null || true
-          cp -v out/backtest-*.png  "$TMPDIR/$TARGET_DIR/" 2>/dev/null || true
-          cp -v out/debug-*.txt      "$TMPDIR/$TARGET_DIR/" 2>/dev/null || true
+          # copy entire downloaded_out contents into target dir
+          cp -av downloaded_out/. "$TMPDIR/$TARGET_DIR/" 2>/dev/null || true
 
           pushd "$TMPDIR" >/dev/null
           git fetch origin "$PUBLISH_BRANCH" || true
