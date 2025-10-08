@@ -42,51 +42,22 @@ jobs:
           if [ -f "$WORKDIR/bt_plot.png" ]; then mv -v "$WORKDIR/bt_plot.png" "$WORKDIR/backtest-$(git rev-parse --short=8 HEAD)-$(date -u +%Y%m%d%H%M).png" || true; fi
           find "$WORKDIR" -maxdepth 2 -type f \( -name "backtest-*.html" -o -name "backtest-*.png" \) -printf "%p %s bytes\n" || true
 
-      - name: Canonicalize latest names
-  shell: bash
-  run: |
-    set -euo pipefail
-    WORKDIR="${GITHUB_WORKSPACE:-$PWD}"
-    html=$(find "$WORKDIR" -maxdepth 2 -type f -name "backtest-*.html" | sort -r | head -n1 || true)
-    png=$(find "$WORKDIR" -maxdepth 2 -type f -name "backtest-*.png" | sort -r | head -n1 || true)
-    if [ -n "$html" ]; then
-      cp -f "$html" "$WORKDIR/backtest-latest.html"
-      echo "Created backtest-latest.html from $html"
-    else
-      echo "No backtest-*.html found to canonicalize" >&2
-    fi
-    if [ -n "$png" ]; then
-      cp -f "$png" "$WORKDIR/backtest-latest.png"
-      echo "Created backtest-latest.png from $png"
-    else
-      echo "No backtest-*.png found to canonicalize" >&2
-    fi
-
-      - name: Dump workspace and debug files (always)
-        if: ${{ always() }}
+            - name: Canonicalize latest names
         shell: bash
         run: |
-          set -euxo pipefail
+          set -euo pipefail
           WORKDIR="${GITHUB_WORKSPACE:-$PWD}"
-          echo "WORKDIR=$WORKDIR"
-          echo "--- ls -la WORKDIR root ---" > debug_workspace_list.txt
-          ls -la "$WORKDIR" >> debug_workspace_list.txt 2>&1 || true
-          echo "--- find candidate files (maxdepth2) ---" >> debug_workspace_list.txt
-          find "$WORKDIR" -maxdepth 2 -type f \( -name "bt_plot.*" -o -name "backtest-*.html" -o -name "backtest-*.png" -o -name "backtest-latest.*" \) -printf "%p %s bytes\n" >> debug_workspace_list.txt 2>&1 || true
-          echo "--- tail of bt_plot.html if exists ---" >> debug_workspace_list.txt
-          if [ -f "$WORKDIR/bt_plot.html" ]; then tail -n +1 "$WORKDIR/bt_plot.html" | sed -n "1,120p" >> debug_workspace_list.txt || true; fi
-          echo "--- ls /proc/self/fd (for debug) ---" >> debug_workspace_list.txt
-          ls -la /proc/self/fd >> debug_workspace_list.txt 2>&1 || true
-            - name: Upload artifact
-        if: ${{ always() }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: backtest-plot
-          path: |
-            **/backtest-*.html
-            **/backtest-*.png
-            **/backtest-latest.html
-            **/backtest-latest.png
-            **/bt_plot.* 
-            **/debug_workspace_list.txt
-          if-no-files-found: warn
+          html=$(find "$WORKDIR" -maxdepth 2 -type f -name "backtest-*.html" | sort -r | head -n1 || true)
+          png=$(find "$WORKDIR" -maxdepth 2 -type f -name "backtest-*.png" | sort -r | head -n1 || true)
+          if [ -n "$html" ]; then
+            cp -f "$html" "$WORKDIR/backtest-latest.html"
+            echo "Created backtest-latest.html from $html"
+          else
+            echo "No backtest-*.html found to canonicalize" >&2
+          fi
+          if [ -n "$png" ]; then
+            cp -f "$png" "$WORKDIR/backtest-latest.png"
+            echo "Created backtest-latest.png from $png"
+          else
+            echo "No backtest-*.png found to canonicalize" >&2
+          fi
