@@ -65,5 +65,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: backtest-plot-${{ env.COMMIT }}-${{ env.TS }}
-          path: backtest-${{ env.COMMIT }}-${{ env.TS }}.html
+          path: backtest-*.html;backtest-*.png
+
 
