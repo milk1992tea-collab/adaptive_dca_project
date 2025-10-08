@@ -10,61 +10,55 @@ jobs:
   backtest:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+- name: Normalize outputs to workspace root
+  run: |
+    set -e
+    WORKDIR="${GITHUB_WORKSPACE:-$PWD}"
+    echo "WORKDIR=$WORKDIR"
+    # list candidates
+    find "$WORKDIR" -type f \( -name "bt_plot.*" -o -name "backtest-*.html" -o -name "backtest-*.png" \) -printf "%p %s bytes\n" || true
+    # move any bt_plot.* into workspace root
+    while IFS= read -r f; do
+      [ -f "$f" ] && mv -v "$f" "$WORKDIR/" || true
+    done < <(find "$WORKDIR" -type f -name "bt_plot.*" -print 2>/dev/null || true)
+    # canonicalize names
+    if [ -f "$WORKDIR/bt_plot.html" ]; then
+      mv -v "$WORKDIR/bt_plot.html" "$WORKDIR/backtest-$(git rev-parse --short=8 HEAD)-$(date -u +%Y%m%d%H%M).html" || true
+    fi
+    if [ -f "$WORKDIR/bt_plot.png" ]; then
+      mv -v "$WORKDIR/bt_plot.png" "$WORKDIR/backtest-$(git rev-parse --short=8 HEAD)-$(date -u +%Y%m%d%H%M).png" || true
+    fi
+    echo "FINAL CANDIDATES:"
+    find "$WORKDIR" -maxdepth 2 -type f \( -name "backtest-*.html" -o -name "backtest-*.png" \) -printf "%p %s bytes\n" || true
 
-      - name: Set python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.11'
-
-      - name: Cache pip
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
-
-      - name: Install deps
-        run: |
-          python -m pip install --upgrade pip
-          pip install --prefer-binary -r requirements.txt
-
-      - name: Run backtest and produce plot
-        run: |
-          # 優先執行實際腳本；若不存在則退出失敗避免上傳測試檔
-          if [ -f "./run_backtest.py" ]; then
-            python ./run_backtest.py --output bt_plot.html
-          elif [ -f "./tools/run_backtest.py" ]; then
-            python ./tools/run_backtest.py --output bt_plot.html
-          else
-            echo "ERROR: run_backtest.py not found in expected locations" >&2
-            echo "Searched: ./run_backtest.py and ./tools/run_backtest.py" >&2
-            exit 1
-          fi
-
-          if [ -f bt_plot.html ]; then
-            echo "bt_plot.html ready, size:"
-            stat -c "%s bytes" bt_plot.html || ls -la bt_plot.html
-          else
-            echo "ERROR: bt_plot.html missing after running backtest" >&2
-            exit 2
-          fi
-
-      - name: Set commit and ts
-        run: |
-          echo "COMMIT=$(git rev-parse --short=8 HEAD)" >> $GITHUB_ENV
-          echo "TS=$(date -u +%Y%m%d%H%M)" >> $GITHUB_ENV
-
-      - name: Rename plot with commit and ts
-        run: |
-          mv bt_plot.html backtest-${{ env.COMMIT }}-${{ env.TS }}.html
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
+- name: Upload artifact
+  uses: actions/upload-artifact@v4
+  with:
+    name: backtest-plot-${{ env.COMMIT }}-${{ env.TS }}
+    path: |
+      **/backtest-*.html
+      **/backtest-*.png
+    if-no-files-found: warn
+  with:
+    name: backtest-debug-dump
+    path: |
+      **/bt_plot.html
+      **/backtest-*.html
+      **/bt_plot.png
+      **/backtest-*.png
+      tools/run_backtest.py
+    if-no-files-found: warn
+  with:
+    name: backtest-plot-${{ env.COMMIT }}-${{ env.TS }}
+    path: |
+      **/backtest-*.html
+      **/backtest-*.png
+    if-no-files-found: warn
         with:
           name: backtest-plot-${{ env.COMMIT }}-${{ env.TS }}
           path: backtest-*.html;backtest-*.png
+
+
+
 
 
