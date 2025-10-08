@@ -1,0 +1,26 @@
+﻿on:
+  push:
+    branches: [ main ]
+
+name: CI Test Artifact
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Create test artifact
+        shell: bash
+        run: |
+          echo "ci-test ok" > test-artifact.txt
+          echo "timestamp: 2025-10-09T00:02:36Z" >> test-artifact.txt
+          ls -la
+
+      - name: Upload test artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ci-test-artifact
+          path: test-artifact.txt
+          if-no-files-found: warn
