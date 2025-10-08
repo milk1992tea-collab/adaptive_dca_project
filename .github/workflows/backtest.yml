@@ -2,68 +2,40 @@
   workflow_dispatch: {}
   push:
     branches: [ main ]
-name: Backtest and Artifacts
 
-on:
-  push:
-    branches:
-      - main
-  workflow_dispatch:
+name: Backtest and Artifacts
 
 jobs:
   backtest:
     runs-on: ubuntu-latest
     steps:
-- name: Normalize outputs to workspace root
-  run: |
-    set -e
-    WORKDIR="${GITHUB_WORKSPACE:-$PWD}"
-    echo "WORKDIR=$WORKDIR"
-    # list candidates
-    find "$WORKDIR" -type f \( -name "bt_plot.*" -o -name "backtest-*.html" -o -name "backtest-*.png" \) -printf "%p %s bytes\n" || true
-    # move any bt_plot.* into workspace root
-    while IFS= read -r f; do
-      [ -f "$f" ] && mv -v "$f" "$WORKDIR/" || true
-    done < <(find "$WORKDIR" -type f -name "bt_plot.*" -print 2>/dev/null || true)
-    # canonicalize names
-    if [ -f "$WORKDIR/bt_plot.html" ]; then
-      mv -v "$WORKDIR/bt_plot.html" "$WORKDIR/backtest-$(git rev-parse --short=8 HEAD)-$(date -u +%Y%m%d%H%M).html" || true
-    fi
-    if [ -f "$WORKDIR/bt_plot.png" ]; then
-      mv -v "$WORKDIR/bt_plot.png" "$WORKDIR/backtest-$(git rev-parse --short=8 HEAD)-$(date -u +%Y%m%d%H%M).png" || true
-    fi
-    echo "FINAL CANDIDATES:"
-    find "$WORKDIR" -maxdepth 2 -type f \( -name "backtest-*.html" -o -name "backtest-*.png" \) -printf "%p %s bytes\n" || true
+      - name: Checkout
+        uses: actions/checkout@v4
 
-- name: Upload artifact
-  uses: actions/upload-artifact@v4
-  with:
-    name: backtest-plot-${{ env.COMMIT }}-${{ env.TS }}
-    path: |
-      **/backtest-*.html
-      **/backtest-*.png
-    if-no-files-found: warn
-  with:
-    name: backtest-debug-dump
-    path: |
-      **/bt_plot.html
-      **/backtest-*.html
-      **/bt_plot.png
-      **/backtest-*.png
-      tools/run_backtest.py
-    if-no-files-found: warn
-  with:
-    name: backtest-plot-${{ env.COMMIT }}-${{ env.TS }}
-    path: |
-      **/backtest-*.html
-      **/backtest-*.png
-    if-no-files-found: warn
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Run backtest and produce plot
+        run: |
+          python tools/run_backtest.py --output bt_plot.html
+
+      - name: Normalize outputs to workspace root
+        run: |
+          set -e
+          WORKDIR="${GITHUB_WORKSPACE:-$PWD}"
+          find "$WORKDIR" -type f \( -name "bt_plot.*" -o -name "backtest-*.html" -o -name "backtest-*.png" \) -printf "%p %s bytes\n" || true
+          while IFS= read -r f; do [ -f "$f" ] && mv -v "$f" "$WORKDIR/" || true; done < <(find "$WORKDIR" -type f -name "bt_plot.*" -print 2>/dev/null || true)
+          if [ -f "$WORKDIR/bt_plot.html" ]; then mv -v "$WORKDIR/bt_plot.html" "$WORKDIR/backtest-$(git rev-parse --short=8 HEAD)-$(date -u +%Y%m%d%H%M).html" || true; fi
+          if [ -f "$WORKDIR/bt_plot.png" ]; then mv -v "$WORKDIR/bt_plot.png" "$WORKDIR/backtest-$(git rev-parse --short=8 HEAD)-$(date -u +%Y%m%d%H%M).png" || true; fi
+          find "$WORKDIR" -maxdepth 2 -type f \( -name "backtest-*.html" -o -name "backtest-*.png" \) -printf "%p %s bytes\n" || true
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
         with:
           name: backtest-plot-${{ env.COMMIT }}-${{ env.TS }}
-          path: backtest-*.html;backtest-*.png
-
-
-
-
-
-
+          path: |
+            **/backtest-*.html
+            **/backtest-*.png
+          if-no-files-found: warn
