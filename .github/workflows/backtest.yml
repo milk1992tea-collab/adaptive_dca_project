@@ -1,15 +1,12 @@
 ﻿on:
   push:
   workflow_dispatch:
+
 name: Backtest and Publish
 
 permissions:
   contents: write
   pages: write
-
-on:
-  push:
-  workflow_dispatch:
 concurrency:
   group: backtest-`${{ github.ref }}`
   cancel-in-progress: false
@@ -181,5 +178,6 @@ PY
           git worktree remove "$TMPDIR" --force || true
           rm -rf "$TMPDIR"
         shell: bash
+
 
 
