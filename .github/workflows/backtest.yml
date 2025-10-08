@@ -17,9 +17,17 @@ jobs:
         with:
           python-version: '3.x'
 
-      - name: Run backtest and produce plot
+            - name: Run backtest and produce plot
+        shell: bash
         run: |
+          set -euo pipefail
+          python -m pip install --upgrade pip
+          python -m pip install pandas matplotlib numpy
+          echo "PWD=$(pwd)"
+          echo "GITHUB_WORKSPACE=${GITHUB_WORKSPACE:-$PWD}"
+          cd "${GITHUB_WORKSPACE:-$PWD}"
           python tools/run_backtest.py --output bt_plot.html
+          ls -la . | sed -n "1,200p"
 
       - name: Normalize outputs to workspace root
         run: |
@@ -39,3 +47,4 @@ jobs:
             **/backtest-*.html
             **/backtest-*.png
           if-no-files-found: warn
+
