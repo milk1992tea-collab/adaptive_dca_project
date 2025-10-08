@@ -42,7 +42,27 @@ jobs:
           if [ -f "$WORKDIR/bt_plot.png" ]; then mv -v "$WORKDIR/bt_plot.png" "$WORKDIR/backtest-$(git rev-parse --short=8 HEAD)-$(date -u +%Y%m%d%H%M).png" || true; fi
           find "$WORKDIR" -maxdepth 2 -type f \( -name "backtest-*.html" -o -name "backtest-*.png" \) -printf "%p %s bytes\n" || true
 
-      - name: Upload artifact
+      - name: Canonicalize latest names
+  shell: bash
+  run: |
+    set -euo pipefail
+    WORKDIR="${GITHUB_WORKSPACE:-$PWD}"
+    html=$(find "$WORKDIR" -maxdepth 2 -type f -name "backtest-*.html" | sort -r | head -n1 || true)
+    png=$(find "$WORKDIR" -maxdepth 2 -type f -name "backtest-*.png" | sort -r | head -n1 || true)
+    if [ -n "$html" ]; then
+      cp -f "$html" "$WORKDIR/backtest-latest.html"
+      echo "Created backtest-latest.html from $html"
+    else
+      echo "No backtest-*.html found to canonicalize" >&2
+    fi
+    if [ -n "$png" ]; then
+      cp -f "$png" "$WORKDIR/backtest-latest.png"
+      echo "Created backtest-latest.png from $png"
+    else
+      echo "No backtest-*.png found to canonicalize" >&2
+    fi
+
+- name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: backtest-plot
@@ -50,3 +70,4 @@ jobs:
             **/backtest-*.html
             **/backtest-*.png
           if-no-files-found: warn
+
