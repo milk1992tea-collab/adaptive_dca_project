@@ -1,0 +1,30 @@
+﻿name: Preflight Workflow Presence Check
+on: [pull_request, push]
+jobs:
+  check-workflows:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Find workflow files
+        run: |
+          shopt -s globstar || true
+          files=(.github/workflows/*.yml .github/workflows/*.yaml)
+          count=0
+          for f in ${files[@]}; do
+            if [ -f "$f" ]; then
+              echo "Found workflow: $f"
+              count=$((count+1))
+            fi
+          done
+          if [ "$count" -eq 0 ]; then
+            echo "Error: no workflow file found under .github/workflows"
+            exit 2
+          fi
+      - name: Parse YAML sanity check
+        run: |
+          for f in .github/workflows/*.yml .github/workflows/*.yaml; do
+            if [ -f "$f" ]; then
+              python -c "import sys,yaml,json; yaml.safe_load(open('$f'))" || (echo "YAML parse failed: $f" && exit 3)
+            fi
+          done
