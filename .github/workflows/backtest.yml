@@ -14,6 +14,7 @@ jobs:
     outputs:
       artifact_sha: ${{ steps.set_artifact_sha.outputs.artifact_sha }}
       commit_sha: ${{ steps.set_commit.outputs.commit_sha }}
+      run_id: ${{ github.run_id }}
     steps:
       - uses: actions/checkout@v4
 
@@ -23,14 +24,13 @@ jobs:
           mkdir -p out
           # replace with real backtest generation commands
           echo "<html>backtest result $(date -u)</html>" > out/backtest-latest.html
-          # optional additional files
           convert -size 320x120 xc:white out/backtest-latest.png 2>/dev/null || true
 
       - name: Compute artifact SHA and expose as output
         id: set_artifact_sha
         run: |
           set -euo pipefail
-          sha=$(sha256sum out/backtest-latest.html | cut -d' ' -f1)
+          sha=$(sha256sum out/backtest-latest.html | cut -d" " -f1)
           echo "artifact_sha=$sha" >> $GITHUB_OUTPUT
           echo "$sha" > out/artifact.sha256
         shell: bash
@@ -63,13 +63,12 @@ jobs:
         id: verify_sha
         run: |
           set -euo pipefail
-          # locate downloaded html
           file=$(find downloaded_out -type f -name "backtest-latest.html" -print -quit)
           if [ -z "${file:-}" ]; then
             echo "Downloaded artifact missing backtest-latest.html" >&2
             exit 1
           fi
-          downloaded_sha=$(sha256sum "$file" | cut -d' ' -f1)
+          downloaded_sha=$(sha256sum "$file" | cut -d" " -f1)
           expected_sha="${{ needs.backtest.outputs.artifact_sha }}"
           echo "downloaded_sha=$downloaded_sha"
           echo "expected_sha=$expected_sha"
@@ -79,11 +78,13 @@ jobs:
           fi
         shell: bash
 
-      - name: Publish backtest artifacts to gh-pages
+      - name: Publish backtest artifacts to gh-pages and update index
         if: always()
         env:
           PUBLISH_BRANCH: gh-pages
           TARGET_DIR: backtests/${{ needs.backtest.outputs.commit_sha }}
+          REPO: ${{ github.repository }}
+          RUN_ID: ${{ github.run_id }}
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
@@ -102,24 +103,75 @@ jobs:
           TMPDIR=$(mktemp -d)
           git worktree add "$TMPDIR" "$PUBLISH_BRANCH"
 
-          # force replace target dir so git will detect changes
+          # Replace target dir so git will detect changes
           rm -rf "$TMPDIR/$TARGET_DIR" || true
           mkdir -p "$TMPDIR/$TARGET_DIR"
           cp -av downloaded_out/. "$TMPDIR/$TARGET_DIR/" 2>/dev/null || true
 
-          pushd "$TMPDIR" >/dev/null
+          # Prepare index update variables
+          cd "$TMPDIR"
           git fetch origin "$PUBLISH_BRANCH" || true
           git reset --mixed "origin/$PUBLISH_BRANCH" || true
 
+          artifact_file="$TARGET_DIR/artifact.sha256"
+          if [ -f "$artifact_file" ]; then
+            artifact_sha=$(cat "$artifact_file" | tr -d " \n")
+          else
+            artifact_sha=""
+          fi
+          commit_short="${GITHUB_SHA:0:8}"
+          run_id="${RUN_ID}"
+          ts=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          index_path="index.json"
+
+          # Read existing index or create empty
+          if [ -f "$index_path" ]; then
+            # safe parse to avoid jq absence by using python fallback
+            if command -v jq >/dev/null 2>&1; then
+              existing=$(jq -c '.' "$index_path")
+            else
+              existing=$(python3 -c "import json,sys;print(json.dumps(json.load(open('$index_path'))))" 2>/dev/null || echo "[]")
+            fi
+          else
+            existing="[]"
+          fi
+
+          # Build new entry
+          new_entry=$(printf '{"path":"%s","sha":"%s","commit":"%s","run":%s,"ts":"%s"}' "$TARGET_DIR" "$artifact_sha" "$commit_short" "$run_id" "$ts")
+
+          # Merge: remove any existing same path, append new
+          if command -v jq >/dev/null 2>&1; then
+            tmp=$(mktemp)
+            echo "$existing" | jq --argjson ne "$new_entry" --arg path "$TARGET_DIR" 'map(select(.path != $path)) + [$ne]' > "$tmp"
+            mv "$tmp" "$index_path"
+          else
+            # Python merge fallback
+            python3 - <<PY
+import json,sys,os
+idx_file = "$index_path"
+try:
+    idx = json.load(open(idx_file))
+except Exception:
+    idx = []
+# filter out same path
+idx = [e for e in idx if e.get("path") != "$TARGET_DIR"]
+# append new
+idx.append($new_entry)
+open(idx_file,"w").write(json.dumps(idx,indent=2))
+PY
+          fi
+
+          # Stage changes and commit only if there are staged differences
           git add -A
           if ! git diff --staged --quiet; then
             git commit -m "ci: publish backtest artifacts for $GITHUB_SHA"
             git push "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}" "$PUBLISH_BRANCH"
-            echo "Published artifacts to $PUBLISH_BRANCH/$TARGET_DIR"
+            echo "Published artifacts to $PUBLISH_BRANCH/$TARGET_DIR and updated index.json"
           else
             echo "No artifact changes to publish"
           fi
-          popd >/dev/null
+
+          cd - >/dev/null || true
           git worktree remove "$TMPDIR" --force || true
           rm -rf "$TMPDIR"
         shell: bash
