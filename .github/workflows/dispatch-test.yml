@@ -1,0 +1,10 @@
+﻿name: Dispatch Test
+on:
+  workflow_dispatch: {}
+jobs:
+  echo:
+    runs-on: ubuntu-latest
+    steps:
+      - name: show hello
+        run: |
+          echo "dispatch-test run"
