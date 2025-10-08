@@ -24,42 +24,42 @@ jobs:
     if: always()
     steps:
       - uses: actions/checkout@v4
-- name: Publish backtest artifacts to gh-pages
-  if: always()
-  env:
-    PUBLISH_BRANCH: gh-pages
-    TARGET_DIR: backtests/${{ github.sha }}
-  run: |
-    set -euo pipefail
-    git config user.name "github-actions[bot]"
-    git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-    if git show-ref --verify --quiet refs/heads/$PUBLISH_BRANCH; then
-      git fetch origin $PUBLISH_BRANCH:$PUBLISH_BRANCH
-    else
-      git fetch origin || true
-      git checkout --orphan $PUBLISH_BRANCH
-      git rm -rf . || true
-      git commit --allow-empty -m "init $PUBLISH_BRANCH"
-      git push origin $PUBLISH_BRANCH
-      git checkout -f $GITHUB_REF || true
-    fi
-    TMPDIR=$(mktemp -d)
-    git worktree add "$TMPDIR" $PUBLISH_BRANCH
-    mkdir -p "$TMPDIR/$TARGET_DIR"
-    cp -v backtest-latest.html "$TMPDIR/$TARGET_DIR/" 2>/dev/null || true
-    cp -v backtest-latest.png  "$TMPDIR/$TARGET_DIR/" 2>/dev/null || true
-    cp -v backtest-*.html "$TMPDIR/$TARGET_DIR/" 2>/dev/null || true
-    cp -v backtest-*.png  "$TMPDIR/$TARGET_DIR/" 2>/dev/null || true
-    cp -v debug-*.txt      "$TMPDIR/$TARGET_DIR/" 2>/dev/null || true
-    pushd "$TMPDIR" >/dev/null
-    git add -A
-    if ! git diff --staged --quiet; then
-      git commit -m "ci: publish backtest artifacts for $GITHUB_SHA"
-      git push "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}" $PUBLISH_BRANCH
-      echo "Published artifacts to $PUBLISH_BRANCH/$TARGET_DIR"
-    else
-      echo "No artifact changes to publish"
-    fi
-    popd >/dev/null
-    git worktree remove "$TMPDIR" --force || true
-    rm -rf "$TMPDIR"
+      - name: Publish backtest artifacts to gh-pages
+        if: always()
+        env:
+          PUBLISH_BRANCH: gh-pages
+          TARGET_DIR: backtests/${{ github.sha }}
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git show-ref --verify --quiet refs/heads/$PUBLISH_BRANCH; then
+            git fetch origin $PUBLISH_BRANCH:$PUBLISH_BRANCH
+          else
+            try { git fetch origin } catch { Write-Output "git fetch failed but continuing" }
+            git checkout --orphan $PUBLISH_BRANCH
+            git rm -rf .
+            git commit --allow-empty -m "init $PUBLISH_BRANCH"
+            git push origin $PUBLISH_BRANCH
+            git checkout -f $GITHUB_REF
+          fi
+          TMPDIR=$(mktemp -d)
+          git worktree add "$TMPDIR" $PUBLISH_BRANCH
+          mkdir -p "$TMPDIR/$TARGET_DIR"
+          cp -v out/backtest-latest.html "$TMPDIR/$TARGET_DIR/" 2>/dev/null || true
+          cp -v out/backtest-latest.png  "$TMPDIR/$TARGET_DIR/" 2>/dev/null || true
+          cp -v out/backtest-*.html "$TMPDIR/$TARGET_DIR/" 2>/dev/null || true
+          cp -v out/backtest-*.png  "$TMPDIR/$TARGET_DIR/" 2>/dev/null || true
+          cp -v out/debug-*.txt      "$TMPDIR/$TARGET_DIR/" 2>/dev/null || true
+          pushd "$TMPDIR" >/dev/null
+          git add -A
+          if ! git diff --staged --quiet; then
+            git commit -m "ci: publish backtest artifacts for $GITHUB_SHA"
+            git push "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}" $PUBLISH_BRANCH
+            echo "Published artifacts to $PUBLISH_BRANCH/$TARGET_DIR"
+          else
+            echo "No artifact changes to publish"
+          fi
+          popd >/dev/null
+          git worktree remove "$TMPDIR" --force
+          rm -rf "$TMPDIR"
