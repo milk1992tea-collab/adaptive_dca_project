@@ -17,21 +17,24 @@ jobs:
         with:
           python-version: '3.x'
 
-            - name: Run backtest and produce plot
+      - name: Install deps
         shell: bash
         run: |
           set -euo pipefail
           python -m pip install --upgrade pip
           python -m pip install pandas matplotlib numpy
-          echo "PWD=$(pwd)"
-          echo "GITHUB_WORKSPACE=${GITHUB_WORKSPACE:-$PWD}"
+
+      - name: Run backtest and produce plot
+        shell: bash
+        run: |
+          set -euo pipefail
           cd "${GITHUB_WORKSPACE:-$PWD}"
           python tools/run_backtest.py --output bt_plot.html
-          ls -la . | sed -n "1,200p"
 
       - name: Normalize outputs to workspace root
+        shell: bash
         run: |
-          set -e
+          set -euo pipefail
           WORKDIR="${GITHUB_WORKSPACE:-$PWD}"
           find "$WORKDIR" -type f \( -name "bt_plot.*" -o -name "backtest-*.html" -o -name "backtest-*.png" \) -printf "%p %s bytes\n" || true
           while IFS= read -r f; do [ -f "$f" ] && mv -v "$f" "$WORKDIR/" || true; done < <(find "$WORKDIR" -type f -name "bt_plot.*" -print 2>/dev/null || true)
@@ -42,9 +45,8 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: backtest-plot-${{ env.COMMIT }}-${{ env.TS }}
+          name: backtest-plot
           path: |
             **/backtest-*.html
             **/backtest-*.png
           if-no-files-found: warn
-
