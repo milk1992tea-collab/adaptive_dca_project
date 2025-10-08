@@ -12,14 +12,29 @@ jobs:
   backtest:
     runs-on: ubuntu-latest
     outputs:
+      artifact_sha: ${{ steps.set_artifact_sha.outputs.artifact_sha }}
       commit_sha: ${{ steps.set_commit.outputs.commit_sha }}
     steps:
       - uses: actions/checkout@v4
-      - name: produce artifact (replace with real backtest)
+
+      - name: Produce artifact
+        id: produce
         run: |
           mkdir -p out
-          echo "<html>backtest result</html>" > out/backtest-latest.html
+          # replace with real backtest generation commands
+          echo "<html>backtest result $(date -u)</html>" > out/backtest-latest.html
+          # optional additional files
           convert -size 320x120 xc:white out/backtest-latest.png 2>/dev/null || true
+
+      - name: Compute artifact SHA and expose as output
+        id: set_artifact_sha
+        run: |
+          set -euo pipefail
+          sha=$(sha256sum out/backtest-latest.html | cut -d' ' -f1)
+          echo "artifact_sha=$sha" >> $GITHUB_OUTPUT
+          echo "$sha" > out/artifact.sha256
+        shell: bash
+
       - name: Set backtest job output commit
         id: set_commit
         run: |
@@ -43,6 +58,26 @@ jobs:
         with:
           name: backtest-out-${{ needs.backtest.outputs.commit_sha }}
           path: downloaded_out
+
+      - name: Verify artifact SHA matches backtest job output
+        id: verify_sha
+        run: |
+          set -euo pipefail
+          # locate downloaded html
+          file=$(find downloaded_out -type f -name "backtest-latest.html" -print -quit)
+          if [ -z "${file:-}" ]; then
+            echo "Downloaded artifact missing backtest-latest.html" >&2
+            exit 1
+          fi
+          downloaded_sha=$(sha256sum "$file" | cut -d' ' -f1)
+          expected_sha="${{ needs.backtest.outputs.artifact_sha }}"
+          echo "downloaded_sha=$downloaded_sha"
+          echo "expected_sha=$expected_sha"
+          if [ "$downloaded_sha" != "$expected_sha" ]; then
+            echo "Artifact mismatch: downloaded SHA does not equal backtest job output SHA" >&2
+            exit 1
+          fi
+        shell: bash
 
       - name: Publish backtest artifacts to gh-pages
         if: always()
@@ -87,3 +122,4 @@ jobs:
           popd >/dev/null
           git worktree remove "$TMPDIR" --force || true
           rm -rf "$TMPDIR"
+        shell: bash
