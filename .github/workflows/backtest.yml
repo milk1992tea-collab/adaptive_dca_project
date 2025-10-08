@@ -18,6 +18,10 @@ jobs:
           mkdir -p out
           echo "<html>ok</html>" > out/backtest-latest.html
           convert -size 100x50 xc:white out/backtest-latest.png 2>/dev/null || true
+      - name: Set backtest job output commit
+        id: set_commit
+        run: |
+          echo "commit_sha=${GITHUB_SHA:0:8}" >> $GITHUB_OUTPUT
 
   publish:
     needs: backtest
@@ -29,7 +33,7 @@ jobs:
         if: always()
         env:
           PUBLISH_BRANCH: gh-pages
-          TARGET_DIR: backtests/${{ github.sha }}
+          TARGET_DIR: backtests/${{ needs.backtest.outputs.commit_sha }}
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
