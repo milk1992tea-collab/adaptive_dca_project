@@ -23,3 +23,12 @@ backtest-*.html
 run_*.json
 jobs_result.txt
 .collect_done.txt
+# local backups and logs
+backups_local/
+.git-backup-*/
+*.bak
+*.log
+backtest-*.html
+run_*.json
+jobs_result.txt
+collect_done.txt
