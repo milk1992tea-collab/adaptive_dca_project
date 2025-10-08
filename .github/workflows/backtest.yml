@@ -75,3 +75,4 @@ jobs:
           popd >/dev/null
           git worktree remove "$TMPDIR" --force || true
           rm -rf "$TMPDIR"
+
