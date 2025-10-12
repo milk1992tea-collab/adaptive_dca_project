@@ -1,0 +1,27 @@
+﻿strategy_name: adaptive_dca
+base_allocation_pct: 0.01
+min_size_pct: 0.0005
+max_size_pct: 0.02
+max_portfolio_exposure_pct: 0.25
+entry:
+  method: volatility_breakout
+  confirmation_candles: 1
+  volatility_ref: 0.02
+dca:
+  add_threshold_pct: 3.0
+  add_limit: 3
+  add_size_policy: fixed
+exit:
+  partial_take_pct: [0.25,0.5,0.25]
+  trailing_sl_pct: 0.08
+  hard_stop_pct: 0.12
+order:
+  ttl_seconds: 30
+  slippage_limit_pct: 0.5
+reconciliation_interval_seconds: 10
+metrics:
+  enabled: true
+  prometheus_endpoint: /metrics
+logging:
+  level: INFO
+  structured: true
