@@ -2,3 +2,12 @@
 app.py.postshim.bak
 app.py.backup_NUL
 app.py.fix9650.bak
+tools/optuna/uvicorn.out.log
+tools/optuna/uvicorn.err.log
+tools/optuna/*.log
+tools/optuna/optuna_panel.db
+tools/optuna/__pycache__/
+backups/
+*.pyc
+__pycache__/
+.venv/
