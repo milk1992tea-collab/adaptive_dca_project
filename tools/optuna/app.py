@@ -9662,3 +9662,24 @@ except Exception:
     except Exception:
         pass
 # --- end modular health shim loader ---
+### modular health shim loader (auto-inserted)
+try:
+    # prefer new modular shims package, fall back to legacy health_shim
+    try:
+        from tools.shims import health as _health_shim
+    except Exception:
+        try:
+            import health_shim as _health_shim
+        except Exception:
+            _health_shim = None
+    # call _maybe_register if available and app present
+    if _health_shim is not None:
+        maybe = getattr(_health_shim, '_maybe_register', None)
+        if maybe is not None:
+            try:
+                maybe(globals().get('app'))
+            except Exception:
+                pass
+except Exception:
+    pass
+# end modular health shim loader
