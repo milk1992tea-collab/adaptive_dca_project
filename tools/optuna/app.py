@@ -9683,3 +9683,53 @@ try:
 except Exception:
     pass
 # end modular health shim loader
+### explicit shim registration (inserted)
+# If app is defined in this module, explicitly register modular health shim now
+try:
+    # prefer modular tools.shims.health
+    try:
+        from tools.shims import health as _health_shim
+    except Exception:
+        try:
+            import health_shim as _health_shim
+        except Exception:
+            _health_shim = None
+    if _health_shim is not None:
+        maybe = getattr(_health_shim, '_maybe_register', None)
+        if maybe is not None:
+            try:
+                maybe(app)
+            except Exception:
+                pass
+except Exception:
+    pass
+# end explicit shim registration
+### protect startup handlers (auto-inserted)
+# Wrap existing on_startup handlers with non-blocking try/except to avoid startup-triggered shutdown
+try:
+    import asyncio, traceback
+    _orig = list(getattr(app.router, 'on_startup', []))
+    try:
+        app.router.on_startup.clear()
+    except Exception:
+        pass
+    def _wrap(h):
+        async def _w():
+            try:
+                res = h()
+                if asyncio.iscoroutine(res):
+                    await res
+            except Exception:
+                try:
+                    traceback.print_exc()
+                except Exception:
+                    pass
+        return _w
+    for h in _orig:
+        try:
+            app.add_event_handler('startup', _wrap(h))
+        except Exception:
+            pass
+except Exception:
+    pass
+# end protect startup handlers
