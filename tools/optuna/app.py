@@ -9653,3 +9653,12 @@ except Exception:
     pass
 
 
+# --- modular health shim loader (added by deploy flow) ---
+try:
+    from tools.shims import health as health_shim
+except Exception:
+    try:
+        import health_shim  # fallback to previous location
+    except Exception:
+        pass
+# --- end modular health shim loader ---
